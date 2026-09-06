@@ -102,15 +102,27 @@ function SviWeightsPage() {
                   <b>{row.signal}</b>
                 </td>
                 <td>
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="0"
-                    max="1"
-                    className="weight-input"
-                    value={row.weight}
-                    onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input
+                      type="range"
+                      step="0.05"
+                      min="0"
+                      max="1"
+                      style={{ width: 80, accentColor: 'var(--a-accent)' }}
+                      value={row.weight}
+                      onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
+                    />
+                    <input
+                      type="number"
+                      step="0.05"
+                      min="0"
+                      max="1"
+                      className="weight-input"
+                      style={{ width: 62 }}
+                      value={row.weight}
+                      onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
+                    />
+                  </div>
                 </td>
                 <td>
                   <input

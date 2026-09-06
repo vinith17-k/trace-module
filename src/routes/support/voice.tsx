@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VictimLayout } from '@/components/trace/VictimLayout';
 import { submitInteraction } from '@/lib/trace.functions';
 
@@ -10,16 +10,28 @@ export const Route = createFileRoute('/support/voice')({
 export function VoiceIntakePage() {
   const navigate = useNavigate();
   const [recording, setRecording] = useState(true);
+  const [seconds, setSeconds] = useState(0);
   const [transcript, setTranscript] = useState(
     "I've been really scared to go home since the incident. My family keeps getting threats from the neighbours."
   );
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let timer: any;
+    if (recording) {
+      timer = setInterval(() => {
+        setSeconds((s) => s + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [recording]);
 
   const stopRecording = () => {
     setRecording(false);
   };
 
   const restartRecording = () => {
+    setSeconds(0);
     setRecording(true);
   };
 
@@ -92,8 +104,11 @@ export function VoiceIntakePage() {
                   <span />
                 </div>
               </div>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#3E5B41', margin: '0 0 4px', fontVariantNumeric: 'tabular-nums' }}>
+                {String(Math.floor(seconds / 60)).padStart(2, '0')}:{String(seconds % 60).padStart(2, '0')} <span style={{ fontSize: 12, color: 'var(--v-muted)', fontWeight: 400 }}>/ 02:00 max</span>
+              </p>
               <p style={{ fontSize: 13, color: 'var(--v-muted)', margin: '0 0 18px' }}>
-                Listening…
+                Listening to audio signals…
               </p>
               <div className="voice-controls">
                 <button type="button" className="round-btn stop" onClick={stopRecording}>

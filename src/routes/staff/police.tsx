@@ -242,19 +242,45 @@ function LawEnforcementPage() {
                 </td>
                 <td>{c.since}</td>
                 <td>
-                  <span
-                    className={`badge ${
-                      c.status === 'FIR registered'
-                        ? 'low'
-                        : c.status === 'Witness secured'
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <span
+                      className={`badge ${
+                        c.status === 'FIR registered'
                           ? 'low'
-                          : c.status === 'On scene'
-                            ? 'high'
-                            : 'critical'
-                    }`}
-                  >
-                    {c.status}
-                  </span>
+                          : c.status === 'Witness secured'
+                            ? 'low'
+                            : c.status === 'On scene'
+                              ? 'high'
+                              : 'critical'
+                      }`}
+                    >
+                      {c.status}
+                    </span>
+
+                    {/* Step progress tracker */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                      {(['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'] as const).map(
+                        (stepName, stepIdx) => {
+                          const order = ['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'];
+                          const currentIdx = order.indexOf(c.status);
+                          const isDone = stepIdx <= currentIdx;
+                          return (
+                            <div
+                              key={stepName}
+                              title={stepName}
+                              style={{
+                                width: 14,
+                                height: 5,
+                                borderRadius: 3,
+                                background: isDone ? (c.risk === 'critical' && currentIdx < 3 ? 'var(--a-critical)' : 'var(--a-low)') : 'var(--a-panel2)',
+                                border: '1px solid var(--a-border)',
+                              }}
+                            />
+                          );
+                        }
+                      )}
+                    </div>
+                  </div>
                 </td>
                 <td>
                   <button

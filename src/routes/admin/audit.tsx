@@ -185,7 +185,24 @@ function AuditLogViewerPage() {
                   <b>{item.actor}</b>
                   <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>{item.role}</div>
                 </td>
-                <td>{item.action}</td>
+                <td>
+                  {item.action.includes('→') ? (
+                    <div>
+                      <span>{item.action.split('(')[0]}</span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 6 }}>
+                        <span style={{ background: 'rgba(224,88,79,0.2)', color: 'var(--a-critical)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
+                          {item.action.split('(')[1]?.split('→')[0]?.trim()}
+                        </span>
+                        <span>→</span>
+                        <span style={{ background: 'rgba(111,162,135,0.2)', color: 'var(--a-low)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
+                          {item.action.split('→')[1]?.replace(')', '').trim()}
+                        </span>
+                      </span>
+                    </div>
+                  ) : (
+                    <span>{item.action}</span>
+                  )}
+                </td>
                 <td>
                   <span className="tag" style={{ color: 'var(--a-text)', fontFamily: 'monospace' }}>
                     {item.target}

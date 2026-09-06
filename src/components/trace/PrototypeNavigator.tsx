@@ -66,8 +66,8 @@ export function PrototypeNavigator() {
       <div
         style={{
           position: 'fixed',
-          bottom: 18,
-          right: 18,
+          bottom: 16,
+          right: 16,
           zIndex: 9999,
           display: 'flex',
           gap: 8,
@@ -82,14 +82,14 @@ export function PrototypeNavigator() {
             color: '#fff',
             border: '2px solid #E0A23D',
             borderRadius: 30,
-            padding: '10px 18px',
-            fontSize: 13,
+            padding: '8px 14px',
+            fontSize: 12.5,
             fontWeight: 800,
             cursor: 'pointer',
             boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 6,
           }}
           aria-label="Toggle Prototype Navigator"
         >

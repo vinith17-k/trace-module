@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useRef, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 
 interface Props {
@@ -6,6 +6,19 @@ interface Props {
 }
 
 export function PublicLayout({ children }: Props) {
+  const [portalOpen, setPortalOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setPortalOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="pub">
       <header className="pub-header">
@@ -13,22 +26,138 @@ export function PublicLayout({ children }: Props) {
           <span className="dot" />
           TRACE
         </Link>
-        <nav className="pub-nav" style={{ flexWrap: 'wrap', gap: 20 }}>
+
+        <nav className="pub-nav">
           <a className="tel-link emerg" href="tel:14566" style={{ fontWeight: 800 }}>
-            📞 Need help now? Call 14566
+            📞 24/7 Helpline: 14566
           </a>
           <Link to="/about">How it works</Link>
           <Link to="/resources">Resources</Link>
-          <Link to="/staff/queue" style={{ color: 'var(--pub-ink)' }}>
-            🩺 Counsellor
-          </Link>
-          <Link to="/staff/police" style={{ color: 'var(--pub-ink)' }}>
-            👮 Police Dept
-          </Link>
-          <Link to="/admin" style={{ color: 'var(--pub-ink)' }}>
-            ⚙️ Admin
-          </Link>
-          <Link to="/support" className="emerg" style={{ fontWeight: 800 }}>
+          <Link to="/contact">Contact</Link>
+
+          {/* Staff & Authority Dropdown */}
+          <div ref={dropdownRef} style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setPortalOpen(!portalOpen)}
+              style={{
+                background: 'none',
+                border: '1px solid #D4CCC0',
+                borderRadius: 8,
+                padding: '6px 12px',
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: 'var(--pub-ink)',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+            >
+              <span>Staff Portals</span>
+              <span style={{ fontSize: 10 }}>▾</span>
+            </button>
+
+            {portalOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: 6,
+                  background: '#FFFFFF',
+                  border: '1px solid #E8E1D2',
+                  borderRadius: 12,
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.12)',
+                  minWidth: 200,
+                  padding: '8px 6px',
+                  zIndex: 100,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
+                <Link
+                  to="/staff/login"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: 'var(--pub-ink)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                  onClick={() => setPortalOpen(false)}
+                >
+                  <span>🔐</span> Staff Login
+                </Link>
+                <Link
+                  to="/staff/queue"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: 'var(--pub-ink)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                  onClick={() => setPortalOpen(false)}
+                >
+                  <span>🩺</span> Counsellor Queue
+                </Link>
+                <Link
+                  to="/staff/police"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: 'var(--pub-ink)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                  onClick={() => setPortalOpen(false)}
+                >
+                  <span>👮</span> Police &amp; Escorts
+                </Link>
+                <div style={{ height: 1, background: '#E8E1D2', margin: '4px 6px' }} />
+                <Link
+                  to="/admin"
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    color: 'var(--pub-ink)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                  onClick={() => setPortalOpen(false)}
+                >
+                  <span>⚙️</span> Administration
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link
+            to="/support"
+            className="btn emerg"
+            style={{
+              background: 'var(--pub-terracotta)',
+              color: '#fff',
+              padding: '8px 16px',
+              fontSize: 13.5,
+              fontWeight: 700,
+              borderRadius: 8,
+            }}
+          >
             Get support now
           </Link>
         </nav>

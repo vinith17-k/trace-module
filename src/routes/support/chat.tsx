@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { VictimLayout } from '@/components/trace/VictimLayout';
 import { submitInteraction } from '@/lib/trace.functions';
 
@@ -102,6 +102,12 @@ export function ChatIntakePage() {
     }
   };
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
+
   return (
     <VictimLayout>
       <div className="v-stage">
@@ -115,7 +121,7 @@ export function ChatIntakePage() {
             ← Back
           </button>
 
-          <div className="chat-window" id="chatWindow">
+          <div className="chat-window" id="chatWindow" style={{ maxHeight: 420, overflowY: 'auto' }}>
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -136,12 +142,18 @@ export function ChatIntakePage() {
             {loading && (
               <div className="bubble-row">
                 <div>
-                  <div className="bubble sys" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>Processing and evaluating trauma cues...</span>
+                  <div className="bubble sys" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '12px 18px' }}>
+                    <span style={{ fontSize: 13 }}>Counsellor intake analyzing</span>
+                    <span className="wave" style={{ height: 14, display: 'inline-flex', gap: 3 }}>
+                      <span style={{ width: 4, height: 8, background: '#3E5B41', borderRadius: 2 }} />
+                      <span style={{ width: 4, height: 12, background: '#3E5B41', borderRadius: 2 }} />
+                      <span style={{ width: 4, height: 8, background: '#3E5B41', borderRadius: 2 }} />
+                    </span>
                   </div>
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} />
           </div>
 
           <div className="chat-input">

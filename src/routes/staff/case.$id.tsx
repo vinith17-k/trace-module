@@ -1,5 +1,5 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 import { SviRing } from '@/components/trace/SviRing';
@@ -16,6 +16,23 @@ function CaseDetailPage() {
   const caseId = params.id || 'NHAA-4F82-K91';
 
   const [revealed, setRevealed] = useState(false);
+  const [revealModalOpen, setRevealModalOpen] = useState(false);
+  const [revealReason, setRevealReason] = useState('Triage verification');
+
+  // Audio player simulation state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(22); // percent
+
+  useEffect(() => {
+    let timer: any;
+    if (isPlaying) {
+      timer = setInterval(() => {
+        setAudioProgress((p) => (p >= 100 ? 0 : p + 2));
+      }, 500);
+    }
+    return () => clearInterval(timer);
+  }, [isPlaying]);
+
   const [modalState, setModalState] = useState<{
     open: boolean;
     title: string;
@@ -42,14 +59,23 @@ function CaseDetailPage() {
     { actor: 'Priya S.', action: 'Case opened', time: '4 min ago' },
   ]);
 
-  const toggleTranscript = () => {
-    if (!revealed) {
-      setAuditLog((prev) => [
-        { actor: 'Priya S.', action: `Revealed transcript for ${caseId}`, time: 'Just now' },
-        ...prev,
-      ]);
+  const handleRevealClick = () => {
+    if (revealed) {
+      setRevealed(false);
+      setToastMessage('Transcript hidden & re-blurred.');
+    } else {
+      setRevealModalOpen(true);
     }
-    setRevealed(!revealed);
+  };
+
+  const handleConfirmReveal = () => {
+    setAuditLog((prev) => [
+      { actor: 'Priya S.', action: `Revealed transcript for ${caseId} (Reason: ${revealReason})`, time: 'Just now' },
+      ...prev,
+    ]);
+    setRevealed(true);
+    setRevealModalOpen(false);
+    setToastMessage(`Transcript revealed. Access logged with reason: "${revealReason}".`);
   };
 
   const handleDispatch = () => {
@@ -103,7 +129,7 @@ function CaseDetailPage() {
         <h2>
           Case {caseId} <BadgeRisk level="critical" style={{ marginLeft: 8 }} />
         </h2>
-        <span className="auth-role">Voice · 12 min ago</span>
+        <span className="auth-role">Voice Intake · 12 min ago</span>
       </div>
 
       <div className="grid-2">
@@ -120,10 +146,111 @@ function CaseDetailPage() {
 
           <div className="panel">
             <h3>Signal breakdown</h3>
-            <SignalBar label="Lexical risk keywords" value={88} />
-            <SignalBar label="Sentiment (negative)" value={74} />
-            <SignalBar label="Acoustic pitch variance" value={65} />
-            <SignalBar label="Pause frequency" value={58} />
+            <SignalBar label="Lexical risk keywords" value={88} color="var(--a-critical)" />
+            <SignalBar label="Sentiment polarity (negative)" value={74} color="var(--a-high)" />
+            <SignalBar label="Acoustic pitch variance" value={65} color="var(--a-high)" />
+            <SignalBar label="Pause frequency & silence" value={58} color="var(--a-moderate)" />
+          </div>
+
+          {/* Audio Waveform Scrubber Component */}
+          <div className="panel">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ margin: 0 }}>Intake Audio Recording</h3>
+              <span style={{ fontSize: 12, color: 'var(--a-muted)', fontVariantNumeric: 'tabular-nums' }}>
+                0:{String(Math.round((audioProgress * 84) / 100)).padStart(2, '0')} / 1:24
+              </span>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--a-panel2)',
+                border: '1px solid var(--a-border)',
+                borderRadius: 12,
+                padding: '14px 16px',
+                marginBottom: 12,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <button
+                  type="button"
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  style={{
+                    background: isPlaying ? 'var(--a-critical)' : 'var(--a-accent)',
+                    border: 'none',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    width: 38,
+                    height: 38,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  {isPlaying ? '❚❚' : '▶'}
+                </button>
+
+                {/* Simulated Audio Waveform Bar */}
+                <div style={{ flex: 1, position: 'relative', height: 28, display: 'flex', alignItems: 'center' }}>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 3,
+                      opacity: 0.35,
+                    }}
+                  >
+                    {[6, 12, 18, 24, 10, 8, 20, 26, 14, 8, 12, 22, 16, 28, 14, 10, 6, 18, 24, 12, 8, 14, 20, 10, 6].map(
+                      (h, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            width: 3,
+                            height: `${h}px`,
+                            background: idx === 7 || idx === 13 ? 'var(--a-critical)' : 'var(--a-accent)',
+                            borderRadius: 2,
+                          }}
+                        />
+                      )
+                    )}
+                  </div>
+
+                  {/* Scrubber tracker */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      width: `${audioProgress}%`,
+                      height: 3,
+                      background: 'var(--a-accent)',
+                      borderRadius: 2,
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: `calc(${audioProgress}% - 6px)`,
+                      width: 12,
+                      height: 12,
+                      borderRadius: '50%',
+                      background: '#fff',
+                      boxShadow: '0 0 8px rgba(0,0,0,0.5)',
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 11, color: 'var(--a-muted)' }}>
+                <span>Start (0:00)</span>
+                <span style={{ color: 'var(--a-critical)' }}>⚠️ 0:24 Vocal Spike</span>
+                <span style={{ color: 'var(--a-critical)' }}>⚠️ 0:44 Stress Pause</span>
+                <span>End (1:24)</span>
+              </div>
+            </div>
           </div>
 
           <div className="panel">
@@ -133,22 +260,15 @@ function CaseDetailPage() {
               className={revealed ? '' : 'transcript-blurred'}
               style={{ fontSize: 13, color: 'var(--a-muted)', lineHeight: 1.6, marginBottom: 14 }}
             >
-              "I don't know how much longer I can keep dealing with this... they said they'll come back if I don't withdraw the complaint. I don't feel safe telling anyone."
+              "I don't know how much longer I can keep dealing with this... they said they'll come back if I don't withdraw the complaint. I don't feel safe telling anyone in the village."
             </p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="btn-ghost reveal-transcript-btn"
-                onClick={toggleTranscript}
+                onClick={handleRevealClick}
               >
-                {revealed ? '🔒 Blur transcript' : '👁 Reveal transcript (access will be logged)'}
-              </button>
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => setToastMessage('Audio player placeholder')}
-              >
-                ▶ Play original audio
+                {revealed ? '🔒 Hide & blur transcript' : '👁 Reveal transcript (requires justification)'}
               </button>
             </div>
           </div>
@@ -169,12 +289,12 @@ function CaseDetailPage() {
             <h3>Recommended action</h3>
             <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '0 0 4px' }}>Priority</p>
             <div style={{ marginBottom: 12 }}>
-              <BadgeRisk level="critical" label="Immediate" />
+              <BadgeRisk level="critical" label="Immediate Dispatch" />
             </div>
 
             <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '12px 0 4px' }}>Action type</p>
             <p style={{ fontSize: 14, fontWeight: 700, margin: '0 0 16px' }}>
-              Police intervention + Witness protection
+              Police intervention + Witness protection safehouse
             </p>
 
             <button
@@ -207,6 +327,41 @@ function CaseDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Mandatory Reason Dialog for Revealing Sensitive Transcript */}
+      {revealModalOpen && (
+        <div className="confirm-modal-backdrop open" onClick={() => setRevealModalOpen(false)}>
+          <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Access Control — Reveal Transcript</h3>
+            <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '0 0 14px' }}>
+              In compliance with the SC/ST Protection of Atrocities Act, viewing victim statements requires an explicit justification that is permanently time-stamped in the audit log.
+            </p>
+
+            <div style={{ marginBottom: 16 }}>
+              <label className="field-label">Reason for access</label>
+              <select
+                className="field-input"
+                value={revealReason}
+                onChange={(e) => setRevealReason(e.target.value)}
+              >
+                <option value="Triage verification">Triage verification &amp; threat confirmation</option>
+                <option value="Escalation to law enforcement">Escalation to law enforcement &amp; FIR support</option>
+                <option value="Clinical mental health review">Clinical mental health &amp; trauma counselling</option>
+                <option value="Court evidence compilation">Special Court evidence verification</option>
+              </select>
+            </div>
+
+            <div className="row">
+              <button type="button" className="btn-ghost" onClick={() => setRevealModalOpen(false)}>
+                Cancel
+              </button>
+              <button type="button" className="btn-dash" onClick={handleConfirmReveal}>
+                Verify &amp; Unblur
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         open={modalState.open}

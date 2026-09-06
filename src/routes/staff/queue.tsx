@@ -11,10 +11,12 @@ interface CaseItem {
   id: string;
   refId: string;
   risk: 'critical' | 'high' | 'moderate' | 'low';
+  score: number;
   indicators: string[];
   channel: string;
   since: string;
   status: string;
+  slaMinutesLeft: number;
 }
 
 const INITIAL_CASES: CaseItem[] = [
@@ -22,47 +24,56 @@ const INITIAL_CASES: CaseItem[] = [
     id: '1',
     refId: 'NHAA-4F82-K91',
     risk: 'critical',
+    score: 87,
     indicators: ['suicidal ideation', 'intimidation'],
     channel: 'Voice',
     since: '12 min',
     status: 'Pending',
+    slaMinutesLeft: 3, // 3m left before 15m Critical SLA breach!
   },
   {
     id: '2',
     refId: 'NHAA-2C10-B44',
     risk: 'high',
+    score: 72,
     indicators: ['fear', 'isolation'],
     channel: 'Chat',
     since: '38 min',
     status: 'Dispatched',
+    slaMinutesLeft: 82,
   },
   {
     id: '3',
     refId: 'NHAA-9A73-L02',
     risk: 'moderate',
+    score: 48,
     indicators: ['depression'],
     channel: 'IVRS',
     since: '1 hr',
     status: 'Pending',
+    slaMinutesLeft: 140,
   },
   {
     id: '4',
     refId: 'NHAA-7E55-Q19',
     risk: 'low',
+    score: 22,
     indicators: ['general distress'],
     channel: 'Webform',
     since: '3 hr',
     status: 'Resolved',
+    slaMinutesLeft: 999,
   },
 ];
 
 function CaseQueuePage() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'critical' | 'high' | 'moderate' | 'low'>('all');
+  const [sortBy, setSortBy] = useState<'risk' | 'sla' | 'time'>('risk');
   const [search, setSearch] = useState('');
 
   const filteredCases = useMemo(() => {
-    return INITIAL_CASES.filter((c) => {
+    const list = INITIAL_CASES.filter((c) => {
       const matchesFilter = filter === 'all' || c.risk === filter;
       const matchesSearch =
         !search.trim() ||
@@ -70,7 +81,13 @@ function CaseQueuePage() {
         c.indicators.some((ind) => ind.toLowerCase().includes(search.toLowerCase()));
       return matchesFilter && matchesSearch;
     });
-  }, [filter, search]);
+
+    return list.sort((a, b) => {
+      if (sortBy === 'risk') return b.score - a.score;
+      if (sortBy === 'sla') return a.slaMinutesLeft - b.slaMinutesLeft;
+      return 0;
+    });
+  }, [filter, sortBy, search]);
 
   return (
     <StaffLayout mode="staff">
@@ -79,26 +96,42 @@ function CaseQueuePage() {
         <span className="auth-role">Counsellor · Priya S.</span>
       </div>
 
-      <div className="filter-row">
-        {(['all', 'critical', 'high', 'moderate', 'low'] as const).map((tier) => (
-          <button
-            key={tier}
-            type="button"
-            className={`chip ${filter === tier ? 'on' : ''}`}
-            onClick={() => setFilter(tier)}
-          >
-            {tier.charAt(0).toUpperCase() + tier.slice(1)}
-          </button>
-        ))}
+      <div className="filter-row" style={{ justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {(['all', 'critical', 'high', 'moderate', 'low'] as const).map((tier) => (
+            <button
+              key={tier}
+              type="button"
+              className={`chip ${filter === tier ? 'on' : ''}`}
+              onClick={() => setFilter(tier)}
+            >
+              {tier.charAt(0).toUpperCase() + tier.slice(1)}
+            </button>
+          ))}
+        </div>
 
-        <input
-          className="search-box"
-          id="queueSearch"
-          placeholder="Search reference ID…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search reference ID"
-        />
+        <div style={{ display: 'flex', gap: 10 }}>
+          <select
+            className="search-box"
+            style={{ maxWidth: 180 }}
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            aria-label="Sort cases"
+          >
+            <option value="risk">Sort: Severity (High $\rightarrow$ Low)</option>
+            <option value="sla">Sort: Urgent SLA countdown</option>
+            <option value="time">Sort: Most recent</option>
+          </select>
+
+          <input
+            className="search-box"
+            id="queueSearch"
+            placeholder="Search ref ID or cue…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Search reference ID"
+          />
+        </div>
       </div>
 
       <div className="queue-meta">
@@ -106,7 +139,8 @@ function CaseQueuePage() {
           Showing {filteredCases.length} of {INITIAL_CASES.length} cases
         </span>
         <span className="sort-indicator">
-          Sorted by: <b style={{ color: 'var(--a-text)' }}>Risk (highest first)</b>
+          Priority Protocol:{' '}
+          <b style={{ color: 'var(--a-critical)' }}>Critical cases require action &lt; 15 min</b>
         </span>
       </div>
 
@@ -114,11 +148,12 @@ function CaseQueuePage() {
         <thead>
           <tr>
             <th>Ref ID</th>
-            <th>Risk</th>
-            <th>Indicators</th>
+            <th>SVI Risk</th>
+            <th>SLA Status</th>
+            <th>Trauma Indicators</th>
             <th>Channel</th>
-            <th>Since</th>
-            <th>Status</th>
+            <th>Elapsed</th>
+            <th>Action Status</th>
             <th aria-hidden="true" />
           </tr>
         </thead>
@@ -138,9 +173,34 @@ function CaseQueuePage() {
                 }
               }}
             >
-              <td><b>{c.refId}</b></td>
+              <td>
+                <b>{c.refId}</b>
+                <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>Score: {c.score}/100</div>
+              </td>
               <td>
                 <BadgeRisk level={c.risk} />
+              </td>
+              <td>
+                {c.status === 'Resolved' ? (
+                  <span style={{ fontSize: 12, color: 'var(--a-low)' }}>✓ Completed</span>
+                ) : c.slaMinutesLeft <= 5 ? (
+                  <span
+                    style={{
+                      fontSize: 11.5,
+                      fontWeight: 800,
+                      color: 'var(--a-critical)',
+                      background: 'rgba(224,88,79,0.15)',
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                    }}
+                  >
+                    ⚠️ SLA: {c.slaMinutesLeft}m left
+                  </span>
+                ) : (
+                  <span style={{ fontSize: 12, color: 'var(--a-muted)' }}>
+                    ⏱ {c.slaMinutesLeft}m left
+                  </span>
+                )}
               </td>
               <td>
                 {c.indicators.map((ind) => (
@@ -159,7 +219,7 @@ function CaseQueuePage() {
           ))}
           {filteredCases.length === 0 && (
             <tr>
-              <td colSpan={7} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
+              <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
                 No cases match the selected filter.
               </td>
             </tr>

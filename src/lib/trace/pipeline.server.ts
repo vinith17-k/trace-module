@@ -203,7 +203,7 @@ export async function analyzeTextSignals(params: {
     language_code: languageCode,
   });
 
-  const { error } = await db.from("stress_signals").insert(rows);
+  const { error } = await db.from("stress_signals").insert(rows as never);
   if (error) throw new Error(`stress_signals insert failed: ${error.message}`);
 
   await db
@@ -272,7 +272,7 @@ export async function analyzeVoiceSignals(params: {
     },
   ];
 
-  const { error } = await db.from("stress_signals").insert(rows);
+  const { error } = await db.from("stress_signals").insert(rows as never);
   if (error) throw new Error(`stress_signals insert failed: ${error.message}`);
 
   // Store the transcript on the interaction (readable only by analysis code

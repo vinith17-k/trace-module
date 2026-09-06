@@ -10,33 +10,362 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminAuditRouteImport } from './routes/admin/audit'
+import { Route as AdminLexiconRouteImport } from './routes/admin/lexicon'
+import { Route as AdminRulesRouteImport } from './routes/admin/rules'
+import { Route as AdminThresholdsRouteImport } from './routes/admin/thresholds'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminWeightsRouteImport } from './routes/admin/weights'
+import { Route as StaffEscalationRouteImport } from './routes/staff/escalation'
+import { Route as StaffLoginRouteImport } from './routes/staff/login'
+import { Route as StaffMyCasesRouteImport } from './routes/staff/my-cases'
+import { Route as StaffPoliceRouteImport } from './routes/staff/police'
+import { Route as StaffQueueRouteImport } from './routes/staff/queue'
+import { Route as SupportIndexRouteImport } from './routes/support/index'
+import { Route as SupportChannelRouteImport } from './routes/support/channel'
+import { Route as SupportChatRouteImport } from './routes/support/chat'
+import { Route as SupportConfirmRouteImport } from './routes/support/confirm'
+import { Route as SupportEmergencyRouteImport } from './routes/support/emergency'
+import { Route as SupportStatusRouteImport } from './routes/support/status'
+import { Route as SupportVoiceRouteImport } from './routes/support/voice'
+import { Route as StaffCaseIdRouteImport } from './routes/staff/case.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLexiconRoute = AdminLexiconRouteImport.update({
+  id: '/admin/lexicon',
+  path: '/admin/lexicon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRulesRoute = AdminRulesRouteImport.update({
+  id: '/admin/rules',
+  path: '/admin/rules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminThresholdsRoute = AdminThresholdsRouteImport.update({
+  id: '/admin/thresholds',
+  path: '/admin/thresholds',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminWeightsRoute = AdminWeightsRouteImport.update({
+  id: '/admin/weights',
+  path: '/admin/weights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffEscalationRoute = StaffEscalationRouteImport.update({
+  id: '/staff/escalation',
+  path: '/staff/escalation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffLoginRoute = StaffLoginRouteImport.update({
+  id: '/staff/login',
+  path: '/staff/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffMyCasesRoute = StaffMyCasesRouteImport.update({
+  id: '/staff/my-cases',
+  path: '/staff/my-cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffPoliceRoute = StaffPoliceRouteImport.update({
+  id: '/staff/police',
+  path: '/staff/police',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffQueueRoute = StaffQueueRouteImport.update({
+  id: '/staff/queue',
+  path: '/staff/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportIndexRoute = SupportIndexRouteImport.update({
+  id: '/support/',
+  path: '/support/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportChannelRoute = SupportChannelRouteImport.update({
+  id: '/support/channel',
+  path: '/support/channel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportChatRoute = SupportChatRouteImport.update({
+  id: '/support/chat',
+  path: '/support/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportConfirmRoute = SupportConfirmRouteImport.update({
+  id: '/support/confirm',
+  path: '/support/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportEmergencyRoute = SupportEmergencyRouteImport.update({
+  id: '/support/emergency',
+  path: '/support/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportStatusRoute = SupportStatusRouteImport.update({
+  id: '/support/status',
+  path: '/support/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportVoiceRoute = SupportVoiceRouteImport.update({
+  id: '/support/voice',
+  path: '/support/voice',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffCaseIdRoute = StaffCaseIdRouteImport.update({
+  id: '/staff/case/$id',
+  path: '/staff/case/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/lexicon': typeof AdminLexiconRoute
+  '/admin/rules': typeof AdminRulesRoute
+  '/admin/thresholds': typeof AdminThresholdsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/weights': typeof AdminWeightsRoute
+  '/staff/escalation': typeof StaffEscalationRoute
+  '/staff/login': typeof StaffLoginRoute
+  '/staff/my-cases': typeof StaffMyCasesRoute
+  '/staff/police': typeof StaffPoliceRoute
+  '/staff/queue': typeof StaffQueueRoute
+  '/support/channel': typeof SupportChannelRoute
+  '/support/chat': typeof SupportChatRoute
+  '/support/confirm': typeof SupportConfirmRoute
+  '/support/emergency': typeof SupportEmergencyRoute
+  '/support/status': typeof SupportStatusRoute
+  '/support/voice': typeof SupportVoiceRoute
+  '/admin/': typeof AdminIndexRoute
+  '/support/': typeof SupportIndexRoute
+  '/staff/case/$id': typeof StaffCaseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/lexicon': typeof AdminLexiconRoute
+  '/admin/rules': typeof AdminRulesRoute
+  '/admin/thresholds': typeof AdminThresholdsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/weights': typeof AdminWeightsRoute
+  '/staff/escalation': typeof StaffEscalationRoute
+  '/staff/login': typeof StaffLoginRoute
+  '/staff/my-cases': typeof StaffMyCasesRoute
+  '/staff/police': typeof StaffPoliceRoute
+  '/staff/queue': typeof StaffQueueRoute
+  '/support/channel': typeof SupportChannelRoute
+  '/support/chat': typeof SupportChatRoute
+  '/support/confirm': typeof SupportConfirmRoute
+  '/support/emergency': typeof SupportEmergencyRoute
+  '/support/status': typeof SupportStatusRoute
+  '/support/voice': typeof SupportVoiceRoute
+  '/admin': typeof AdminIndexRoute
+  '/support': typeof SupportIndexRoute
+  '/staff/case/$id': typeof StaffCaseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
+  '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/lexicon': typeof AdminLexiconRoute
+  '/admin/rules': typeof AdminRulesRoute
+  '/admin/thresholds': typeof AdminThresholdsRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/weights': typeof AdminWeightsRoute
+  '/staff/escalation': typeof StaffEscalationRoute
+  '/staff/login': typeof StaffLoginRoute
+  '/staff/my-cases': typeof StaffMyCasesRoute
+  '/staff/police': typeof StaffPoliceRoute
+  '/staff/queue': typeof StaffQueueRoute
+  '/support/channel': typeof SupportChannelRoute
+  '/support/chat': typeof SupportChatRoute
+  '/support/confirm': typeof SupportConfirmRoute
+  '/support/emergency': typeof SupportEmergencyRoute
+  '/support/status': typeof SupportStatusRoute
+  '/support/voice': typeof SupportVoiceRoute
+  '/admin/': typeof AdminIndexRoute
+  '/support/': typeof SupportIndexRoute
+  '/staff/case/$id': typeof StaffCaseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/resources'
+    | '/terms'
+    | '/admin/audit'
+    | '/admin/lexicon'
+    | '/admin/rules'
+    | '/admin/thresholds'
+    | '/admin/users'
+    | '/admin/weights'
+    | '/staff/escalation'
+    | '/staff/login'
+    | '/staff/my-cases'
+    | '/staff/police'
+    | '/staff/queue'
+    | '/support/channel'
+    | '/support/chat'
+    | '/support/confirm'
+    | '/support/emergency'
+    | '/support/status'
+    | '/support/voice'
+    | '/admin/'
+    | '/support/'
+    | '/staff/case/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/resources'
+    | '/terms'
+    | '/admin/audit'
+    | '/admin/lexicon'
+    | '/admin/rules'
+    | '/admin/thresholds'
+    | '/admin/users'
+    | '/admin/weights'
+    | '/staff/escalation'
+    | '/staff/login'
+    | '/staff/my-cases'
+    | '/staff/police'
+    | '/staff/queue'
+    | '/support/channel'
+    | '/support/chat'
+    | '/support/confirm'
+    | '/support/emergency'
+    | '/support/status'
+    | '/support/voice'
+    | '/admin'
+    | '/support'
+    | '/staff/case/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/contact'
+    | '/privacy'
+    | '/resources'
+    | '/terms'
+    | '/admin/audit'
+    | '/admin/lexicon'
+    | '/admin/rules'
+    | '/admin/thresholds'
+    | '/admin/users'
+    | '/admin/weights'
+    | '/staff/escalation'
+    | '/staff/login'
+    | '/staff/my-cases'
+    | '/staff/police'
+    | '/staff/queue'
+    | '/support/channel'
+    | '/support/chat'
+    | '/support/confirm'
+    | '/support/emergency'
+    | '/support/status'
+    | '/support/voice'
+    | '/admin/'
+    | '/support/'
+    | '/staff/case/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ResourcesRoute: typeof ResourcesRoute
+  TermsRoute: typeof TermsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminLexiconRoute: typeof AdminLexiconRoute
+  AdminRulesRoute: typeof AdminRulesRoute
+  AdminThresholdsRoute: typeof AdminThresholdsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminWeightsRoute: typeof AdminWeightsRoute
+  StaffEscalationRoute: typeof StaffEscalationRoute
+  StaffLoginRoute: typeof StaffLoginRoute
+  StaffMyCasesRoute: typeof StaffMyCasesRoute
+  StaffPoliceRoute: typeof StaffPoliceRoute
+  StaffQueueRoute: typeof StaffQueueRoute
+  SupportChannelRoute: typeof SupportChannelRoute
+  SupportChatRoute: typeof SupportChatRoute
+  SupportConfirmRoute: typeof SupportConfirmRoute
+  SupportEmergencyRoute: typeof SupportEmergencyRoute
+  SupportStatusRoute: typeof SupportStatusRoute
+  SupportVoiceRoute: typeof SupportVoiceRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  SupportIndexRoute: typeof SupportIndexRoute
+  StaffCaseIdRoute: typeof StaffCaseIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +377,211 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/lexicon': {
+      id: '/admin/lexicon'
+      path: '/admin/lexicon'
+      fullPath: '/admin/lexicon'
+      preLoaderRoute: typeof AdminLexiconRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/rules': {
+      id: '/admin/rules'
+      path: '/admin/rules'
+      fullPath: '/admin/rules'
+      preLoaderRoute: typeof AdminRulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/thresholds': {
+      id: '/admin/thresholds'
+      path: '/admin/thresholds'
+      fullPath: '/admin/thresholds'
+      preLoaderRoute: typeof AdminThresholdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/weights': {
+      id: '/admin/weights'
+      path: '/admin/weights'
+      fullPath: '/admin/weights'
+      preLoaderRoute: typeof AdminWeightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/escalation': {
+      id: '/staff/escalation'
+      path: '/staff/escalation'
+      fullPath: '/staff/escalation'
+      preLoaderRoute: typeof StaffEscalationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/login': {
+      id: '/staff/login'
+      path: '/staff/login'
+      fullPath: '/staff/login'
+      preLoaderRoute: typeof StaffLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/my-cases': {
+      id: '/staff/my-cases'
+      path: '/staff/my-cases'
+      fullPath: '/staff/my-cases'
+      preLoaderRoute: typeof StaffMyCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/police': {
+      id: '/staff/police'
+      path: '/staff/police'
+      fullPath: '/staff/police'
+      preLoaderRoute: typeof StaffPoliceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/queue': {
+      id: '/staff/queue'
+      path: '/staff/queue'
+      fullPath: '/staff/queue'
+      preLoaderRoute: typeof StaffQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/': {
+      id: '/support/'
+      path: '/support'
+      fullPath: '/support/'
+      preLoaderRoute: typeof SupportIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/channel': {
+      id: '/support/channel'
+      path: '/support/channel'
+      fullPath: '/support/channel'
+      preLoaderRoute: typeof SupportChannelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/chat': {
+      id: '/support/chat'
+      path: '/support/chat'
+      fullPath: '/support/chat'
+      preLoaderRoute: typeof SupportChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/confirm': {
+      id: '/support/confirm'
+      path: '/support/confirm'
+      fullPath: '/support/confirm'
+      preLoaderRoute: typeof SupportConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/emergency': {
+      id: '/support/emergency'
+      path: '/support/emergency'
+      fullPath: '/support/emergency'
+      preLoaderRoute: typeof SupportEmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/status': {
+      id: '/support/status'
+      path: '/support/status'
+      fullPath: '/support/status'
+      preLoaderRoute: typeof SupportStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/voice': {
+      id: '/support/voice'
+      path: '/support/voice'
+      fullPath: '/support/voice'
+      preLoaderRoute: typeof SupportVoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff/case/$id': {
+      id: '/staff/case/$id'
+      path: '/staff/case/$id'
+      fullPath: '/staff/case/$id'
+      preLoaderRoute: typeof StaffCaseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
+  PrivacyRoute: PrivacyRoute,
+  ResourcesRoute: ResourcesRoute,
+  TermsRoute: TermsRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminLexiconRoute: AdminLexiconRoute,
+  AdminRulesRoute: AdminRulesRoute,
+  AdminThresholdsRoute: AdminThresholdsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminWeightsRoute: AdminWeightsRoute,
+  StaffEscalationRoute: StaffEscalationRoute,
+  StaffLoginRoute: StaffLoginRoute,
+  StaffMyCasesRoute: StaffMyCasesRoute,
+  StaffPoliceRoute: StaffPoliceRoute,
+  StaffQueueRoute: StaffQueueRoute,
+  SupportChannelRoute: SupportChannelRoute,
+  SupportChatRoute: SupportChatRoute,
+  SupportConfirmRoute: SupportConfirmRoute,
+  SupportEmergencyRoute: SupportEmergencyRoute,
+  SupportStatusRoute: SupportStatusRoute,
+  SupportVoiceRoute: SupportVoiceRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  SupportIndexRoute: SupportIndexRoute,
+  StaffCaseIdRoute: StaffCaseIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

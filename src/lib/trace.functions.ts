@@ -140,28 +140,40 @@ export const getStatusByRef = createServerFn({ method: "POST" })
     };
   });
 
-/** Role-filtered dashboard read. RLS decides what the caller can see. */
+const DashboardInput = z.object({
+  page: z.number().int().positive().default(1),
+  pageSize: z.number().int().min(1).max(200).default(50),
+});
+
+/** Role-filtered dashboard read with pagination. RLS decides what the caller can see. */
 export const getCaseDashboard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: unknown) => DashboardInput.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { page, pageSize } = data;
+    const offset = (page - 1) * pageSize;
 
     const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     const roleList = (roles ?? []).map((r) => r.role as string);
     const isPrivileged = roleList.includes("admin") || roleList.includes("counsellor");
 
-    const { data: assessments } = await supabase
+    const { data: assessments, count: totalCount } = await supabase
       .from("svi_assessments")
-      .select("id, interaction_id, svi_score, risk_category, trauma_indicators, computed_at")
+      .select("id, interaction_id, svi_score, risk_category, trauma_indicators, computed_at", { count: "exact" })
       .is("deleted_at", null)
       .order("computed_at", { ascending: false })
-      .limit(200);
+      .range(offset, offset + pageSize - 1);
 
-    const { data: recommendations } = await supabase
-      .from("recommendations")
-      .select("id, svi_assessment_id, action_type, priority, status, assigned_authority")
-      .is("deleted_at", null)
-      .limit(500);
+    const assessmentIds = (assessments ?? []).map((a) => a.id);
+
+    const { data: recommendations } = assessmentIds.length
+      ? await supabase
+          .from("recommendations")
+          .select("id, svi_assessment_id, action_type, priority, status, assigned_authority")
+          .is("deleted_at", null)
+          .in("svi_assessment_id", assessmentIds)
+      : { data: [] };
 
     const list = (assessments ?? []).map((a) => ({
       assessmentId: a.id,
@@ -173,14 +185,105 @@ export const getCaseDashboard = createServerFn({ method: "POST" })
       recommendations: (recommendations ?? []).filter((r) => r.svi_assessment_id === a.id),
     }));
 
+    const total = totalCount ?? 0;
+
     return {
       roles: roleList,
       canSeeCaseDetail: isPrivileged,
       totals: {
-        cases: list.length,
+        cases: total,
         critical: list.filter((c) => c.riskCategory === "critical").length,
         high: list.filter((c) => c.riskCategory === "high").length,
       },
       cases: list,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
     };
+  });
+
+/* ------------------------------------------------------------------ */
+/* linkVictimIdentity — admin / counsellor only                         */
+/* ------------------------------------------------------------------ */
+
+const LinkIdentityInput = z.object({
+  interactionId: z.string().uuid(),
+  fullName: z.string().min(1).max(255).optional(),
+  contactNumber: z.string().max(20).optional(),
+  email: z.string().email().optional(),
+  address: z.string().max(1000).optional(),
+  assignedCounsellorId: z.string().uuid().optional(),
+});
+
+/**
+ * Create or update a victim_identity record and link it to an interaction.
+ * Requires admin or counsellor role. All PII lives in victim_identity only,
+ * never surfaced in interactions or logs.
+ */
+export const linkVictimIdentity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => LinkIdentityInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // Role gate: only admin or counsellor may access PII.
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    const roleList = (roles ?? []).map((r) => r.role as string);
+    if (!roleList.includes("admin") && !roleList.includes("counsellor")) {
+      throw new Error("Forbidden: only admin or counsellor roles may manage victim identity");
+    }
+
+    // Check the interaction exists and is not soft-deleted.
+    const { data: interaction, error: iErr } = await supabase
+      .from("interactions")
+      .select("id, identity_ref")
+      .eq("id", data.interactionId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (iErr || !interaction) throw new Error("Interaction not found");
+
+    let identityId: string;
+
+    if (interaction.identity_ref) {
+      // Update existing PII record.
+      const { error: uErr } = await supabase
+        .from("victim_identity")
+        .update({
+          ...(data.fullName !== undefined && { full_name: data.fullName }),
+          ...(data.contactNumber !== undefined && { contact_number: data.contactNumber }),
+          ...(data.email !== undefined && { email: data.email }),
+          ...(data.address !== undefined && { address: data.address }),
+          ...(data.assignedCounsellorId !== undefined && { assigned_counsellor_id: data.assignedCounsellorId }),
+        })
+        .eq("id", interaction.identity_ref);
+      if (uErr) throw new Error(`victim_identity update failed: ${uErr.message}`);
+      identityId = interaction.identity_ref;
+    } else {
+      // Insert new PII record.
+      const { data: inserted, error: insErr } = await supabase
+        .from("victim_identity")
+        .insert({
+          full_name: data.fullName ?? null,
+          contact_number: data.contactNumber ?? null,
+          email: data.email ?? null,
+          address: data.address ?? null,
+          assigned_counsellor_id: data.assignedCounsellorId ?? null,
+        })
+        .select("id")
+        .single();
+      if (insErr || !inserted) throw new Error(`victim_identity insert failed: ${insErr?.message}`);
+      identityId = inserted.id;
+
+      // Link the interaction → victim_identity via non-guessable UUID.
+      const { error: linkErr } = await supabase
+        .from("interactions")
+        .update({ identity_ref: identityId })
+        .eq("id", data.interactionId);
+      if (linkErr) throw new Error(`interactions update failed: ${linkErr.message}`);
+    }
+
+    return { identityId, interactionId: data.interactionId, linked: true };
   });

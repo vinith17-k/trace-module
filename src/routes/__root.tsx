@@ -77,14 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "TRACE — Trauma Risk Assessment & Care Escalation" },
+      {
+        name: "description",
+        content:
+          "TRACE: AI-enabled stress and trauma assessment pipeline for victim support helplines. Real-time SVI scoring, risk classification, and care recommendation.",
+      },
+      { name: "author", content: "TRACE System" },
+      { property: "og:title", content: "TRACE — Trauma Risk Assessment & Care Escalation" },
+      {
+        property: "og:description",
+        content:
+          "Real-time stress and trauma assessment for victim support helplines: SVI scoring, risk escalation, and care recommendations.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
     links: [
       {

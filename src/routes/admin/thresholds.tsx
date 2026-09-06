@@ -57,49 +57,51 @@ function RiskThresholdsPage() {
         Cases scoring within each bracket automatically trigger the corresponding protocol. Threshold changes are logged with administrative accountability.
       </p>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="config-table">
-          <thead>
-            <tr>
-              <th>Risk Category</th>
-              <th style={{ width: 120 }}>Min Score</th>
-              <th style={{ width: 120 }}>Max Score</th>
-              <th>Triggered Protocol Summary</th>
-            </tr>
-          </thead>
-          <tbody>
-            {thresholds.map((row, idx) => (
-              <tr key={row.tier}>
-                <td>
-                  <BadgeRisk level={row.tier} />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    className="threshold-input"
-                    value={row.min}
-                    onChange={(e) => handleBoundChange(idx, 'min', parseInt(e.target.value) || 0)}
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    className="threshold-input"
-                    value={row.max}
-                    onChange={(e) => handleBoundChange(idx, 'max', parseInt(e.target.value) || 0)}
-                  />
-                </td>
-                <td style={{ fontSize: 12.5, color: 'var(--a-text)' }}>
-                  {row.actionSummary}
-                </td>
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="config-table">
+            <thead>
+              <tr>
+                <th>Risk Category</th>
+                <th style={{ width: 120 }}>Min Score</th>
+                <th style={{ width: 120 }}>Max Score</th>
+                <th>Triggered Protocol Summary</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {thresholds.map((row, idx) => (
+                <tr key={row.tier}>
+                  <td>
+                    <BadgeRisk level={row.tier} />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      className="threshold-input"
+                      value={row.min}
+                      onChange={(e) => handleBoundChange(idx, 'min', parseInt(e.target.value) || 0)}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      className="threshold-input"
+                      value={row.max}
+                      onChange={(e) => handleBoundChange(idx, 'max', parseInt(e.target.value) || 0)}
+                    />
+                  </td>
+                  <td style={{ fontSize: 12.5, color: 'var(--a-text)' }}>
+                    {row.actionSummary}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {toastMessage && (

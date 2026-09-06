@@ -192,8 +192,26 @@ function CaseDetailPage() {
                   {isPlaying ? '❚❚' : '▶'}
                 </button>
 
-                {/* Simulated Audio Waveform Bar */}
-                <div style={{ flex: 1, position: 'relative', height: 28, display: 'flex', alignItems: 'center' }}>
+                {/* Interactive Audio Waveform Bar with Click-to-Seek */}
+                <div
+                  style={{ flex: 1, position: 'relative', height: 28, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const pct = Math.max(0, Math.min(100, (clickX / rect.width) * 100));
+                    setAudioProgress(Math.round(pct));
+                  }}
+                  role="slider"
+                  aria-label="Audio playback scrubber"
+                  aria-valuenow={Math.round(audioProgress)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowRight') setAudioProgress((p) => Math.min(100, p + 5));
+                    if (e.key === 'ArrowLeft') setAudioProgress((p) => Math.max(0, p - 5));
+                  }}
+                >
                   <div
                     style={{
                       position: 'absolute',
@@ -246,8 +264,40 @@ function CaseDetailPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, fontSize: 11, color: 'var(--a-muted)' }}>
                 <span>Start (0:00)</span>
-                <span style={{ color: 'var(--a-critical)' }}>⚠️ 0:24 Vocal Spike</span>
-                <span style={{ color: 'var(--a-critical)' }}>⚠️ 0:44 Stress Pause</span>
+                <button
+                  type="button"
+                  onClick={() => setAudioProgress(29)}
+                  style={{
+                    background: 'rgba(224,88,79,0.12)',
+                    border: '1px solid rgba(224,88,79,0.3)',
+                    borderRadius: 4,
+                    color: 'var(--a-critical)',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                  title="Jump to vocal spike at 0:24"
+                >
+                  ⚠️ 0:24 Vocal Spike
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAudioProgress(52)}
+                  style={{
+                    background: 'rgba(224,88,79,0.12)',
+                    border: '1px solid rgba(224,88,79,0.3)',
+                    borderRadius: 4,
+                    color: 'var(--a-critical)',
+                    cursor: 'pointer',
+                    padding: '2px 6px',
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                  title="Jump to stress pause at 0:44"
+                >
+                  ⚠️ 0:44 Stress Pause
+                </button>
                 <span>End (1:24)</span>
               </div>
             </div>

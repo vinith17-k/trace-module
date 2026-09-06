@@ -190,120 +190,122 @@ function LawEnforcementPage() {
       </div>
 
       {/* Police Cases Table */}
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="case-table">
-          <thead>
-            <tr>
-              <th>Ref ID</th>
-              <th>Threat Level</th>
-              <th>Action Needed</th>
-              <th>Precinct / Station</th>
-              <th>Assigned Unit</th>
-              <th>Elapsed</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCases.map((c) => (
-              <tr key={c.refId}>
-                <td>
-                  <b
-                    style={{ cursor: 'pointer', color: 'var(--a-accent)' }}
-                    onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
-                  >
-                    {c.refId}
-                  </b>
-                  {c.firNumber && (
-                    <div style={{ fontSize: 11, color: 'var(--a-muted)', marginTop: 2 }}>
-                      {c.firNumber}
-                    </div>
-                  )}
-                </td>
-                <td>
-                  <BadgeRisk level={c.risk} />
-                </td>
-                <td>
-                  <div>{c.action}</div>
-                  <div style={{ marginTop: 4 }}>
-                    {c.applicableSections.map((sec) => (
-                      <span key={sec} className="tag" style={{ fontSize: 10 }}>
-                        {sec}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td>
-                  <b>{c.district}</b>
-                  <div style={{ fontSize: 11.5, color: 'var(--a-muted)' }}>{c.policeStation}</div>
-                </td>
-                <td>
-                  <span style={{ fontSize: 12.5 }}>{c.unit}</span>
-                </td>
-                <td>{c.since}</td>
-                <td>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span
-                      className={`badge ${
-                        c.status === 'FIR registered'
-                          ? 'low'
-                          : c.status === 'Witness secured'
-                            ? 'low'
-                            : c.status === 'On scene'
-                              ? 'high'
-                              : 'critical'
-                      }`}
-                    >
-                      {c.status}
-                    </span>
-
-                    {/* Step progress tracker */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                      {(['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'] as const).map(
-                        (stepName, stepIdx) => {
-                          const order = ['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'];
-                          const currentIdx = order.indexOf(c.status);
-                          const isDone = stepIdx <= currentIdx;
-                          return (
-                            <div
-                              key={stepName}
-                              title={stepName}
-                              style={{
-                                width: 14,
-                                height: 5,
-                                borderRadius: 3,
-                                background: isDone ? (c.risk === 'critical' && currentIdx < 3 ? 'var(--a-critical)' : 'var(--a-low)') : 'var(--a-panel2)',
-                                border: '1px solid var(--a-border)',
-                              }}
-                            />
-                          );
-                        }
-                      )}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn-dash"
-                    style={{ fontSize: 12, padding: '5px 10px' }}
-                    onClick={() => handleOpenUpdate(c)}
-                  >
-                    Update Status
-                  </button>
-                </td>
-              </tr>
-            ))}
-
-            {filteredCases.length === 0 && (
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="case-table">
+            <thead>
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
-                  No police dispatches match the selected filter.
-                </td>
+                <th>Ref ID</th>
+                <th>Threat Level</th>
+                <th>Action Needed</th>
+                <th>Precinct / Station</th>
+                <th>Assigned Unit</th>
+                <th>Elapsed</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredCases.map((c) => (
+                <tr key={c.refId}>
+                  <td>
+                    <b
+                      style={{ cursor: 'pointer', color: 'var(--a-accent)' }}
+                      onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
+                    >
+                      {c.refId}
+                    </b>
+                    {c.firNumber && (
+                      <div style={{ fontSize: 11, color: 'var(--a-muted)', marginTop: 2 }}>
+                        {c.firNumber}
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <BadgeRisk level={c.risk} />
+                  </td>
+                  <td>
+                    <div>{c.action}</div>
+                    <div style={{ marginTop: 4 }}>
+                      {c.applicableSections.map((sec) => (
+                        <span key={sec} className="tag" style={{ fontSize: 10 }}>
+                          {sec}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td>
+                    <b>{c.district}</b>
+                    <div style={{ fontSize: 11.5, color: 'var(--a-muted)' }}>{c.policeStation}</div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: 12.5 }}>{c.unit}</span>
+                  </td>
+                  <td>{c.since}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <span
+                        className={`badge ${
+                          c.status === 'FIR registered'
+                            ? 'low'
+                            : c.status === 'Witness secured'
+                              ? 'low'
+                              : c.status === 'On scene'
+                                ? 'high'
+                                : 'critical'
+                        }`}
+                      >
+                        {c.status}
+                      </span>
+
+                      {/* Step progress tracker */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                        {(['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'] as const).map(
+                          (stepName, stepIdx) => {
+                            const order = ['Dispatched', 'En route', 'On scene', 'Witness secured', 'FIR registered'];
+                            const currentIdx = order.indexOf(c.status);
+                            const isDone = stepIdx <= currentIdx;
+                            return (
+                              <div
+                                key={stepName}
+                                title={stepName}
+                                style={{
+                                  width: 14,
+                                  height: 5,
+                                  borderRadius: 3,
+                                  background: isDone ? (c.risk === 'critical' && currentIdx < 3 ? 'var(--a-critical)' : 'var(--a-low)') : 'var(--a-panel2)',
+                                  border: '1px solid var(--a-border)',
+                                }}
+                              />
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn-dash"
+                      style={{ fontSize: 12, padding: '5px 10px' }}
+                      onClick={() => handleOpenUpdate(c)}
+                    >
+                      Update Status
+                    </button>
+                  </td>
+                </tr>
+              ))}
+
+              {filteredCases.length === 0 && (
+                <tr>
+                  <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
+                    No police dispatches match the selected filter.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Statutory Notice */}

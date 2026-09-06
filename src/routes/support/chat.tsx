@@ -38,6 +38,7 @@ export function ChatIntakePage() {
   ]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const formatTime = () => {
@@ -45,9 +46,9 @@ export function ChatIntakePage() {
     return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const handleSend = async () => {
+  const handleSend = () => {
     const text = inputText.trim();
-    if (!text || loading) return;
+    if (!text || loading || isTyping) return;
 
     const userMsg: ChatMessage = {
       id: Date.now().toString(),
@@ -58,19 +59,49 @@ export function ChatIntakePage() {
 
     setMessages((prev) => [...prev, userMsg]);
     setInputText('');
+    setIsTyping(true);
+
+    // Simulate empathetic intake response
+    setTimeout(() => {
+      setIsTyping(false);
+      const botResponses = [
+        "I hear you, and thank you for telling me. Please know you are safe here. You can share more details, or click 'Finish Assessment & Connect' whenever you're ready.",
+        "We are noting everything you share. Is there any immediate physical danger to you or your family right now?",
+        "Thank you for your courage in sharing this. A specialist counsellor will review these details immediately once you finish.",
+      ];
+      const botText: string =
+        botResponses[Math.floor(Math.random() * botResponses.length)] ??
+        "I hear you, and thank you for telling me. You can share more details, or click 'Finish Assessment & Connect' whenever you're ready.";
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          sender: 'sys',
+          text: botText,
+          time: formatTime(),
+        },
+      ]);
+    }, 1200);
+  };
+
+  const handleFinishAssessment = async () => {
+    if (loading) return;
     setLoading(true);
     setErrorMsg(null);
 
     try {
       // Gather all user messages as conversation context
-      const allUserTexts = [...messages.filter((m) => m.sender === 'user').map((m) => m.text), text].join('\n');
+      const allUserTexts = messages
+        .filter((m) => m.sender === 'user')
+        .map((m) => m.text)
+        .join('\n');
 
       const result = await submitInteraction({
         data: {
           channel: 'chatbot',
           languageCode: 'en',
           consentGiven: true,
-          rawText: allUserTexts,
+          rawText: allUserTexts || 'Victim reached out via chat intake.',
         },
       });
 
@@ -79,7 +110,7 @@ export function ChatIntakePage() {
       navigate({ to: '/support/confirm' });
     } catch (err: unknown) {
       console.error('TRACE pipeline error:', err);
-      // Even if service role key or API is missing in mock/dev, allow user to proceed with fallback data
+      // Fallback for prototype demo
       const fallbackResult = {
         interactionId: 'local-demo-' + Math.random().toString(36).substring(2, 9),
         anonymizedRefId: 'NHAA-' + Math.random().toString(36).substring(2, 6).toUpperCase() + '-K91',
@@ -106,7 +137,7 @@ export function ChatIntakePage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, loading, isTyping]);
 
   return (
     <VictimLayout>
@@ -121,7 +152,15 @@ export function ChatIntakePage() {
             ← Back
           </button>
 
-          <div className="chat-window" id="chatWindow" style={{ maxHeight: 420, overflowY: 'auto' }}>
+          <div
+            className="chat-window"
+            id="chatWindow"
+            style={{
+              height: 'min(480px, calc(100dvh - 300px))',
+              minHeight: 300,
+              overflowY: 'auto',
+            }}
+          >
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -139,11 +178,42 @@ export function ChatIntakePage() {
               </div>
             ))}
 
+            {isTyping && (
+              <div className="bubble-row">
+                <div>
+                  <div
+                    className="bubble sys"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '10px 16px',
+                    }}
+                  >
+                    <span style={{ fontSize: 13, color: '#26362A' }}>Listening &amp; typing</span>
+                    <span className="wave" style={{ height: 12, display: 'inline-flex', gap: 3 }}>
+                      <span style={{ width: 4, height: 8, background: '#3E5B41', borderRadius: 2 }} />
+                      <span style={{ width: 4, height: 12, background: '#3E5B41', borderRadius: 2 }} />
+                      <span style={{ width: 4, height: 8, background: '#3E5B41', borderRadius: 2 }} />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {loading && (
               <div className="bubble-row">
                 <div>
-                  <div className="bubble sys" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '12px 18px' }}>
-                    <span style={{ fontSize: 13 }}>Counsellor intake analyzing</span>
+                  <div
+                    className="bubble sys"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      padding: '12px 18px',
+                    }}
+                  >
+                    <span style={{ fontSize: 13 }}>Analyzing trauma signals &amp; connecting support</span>
                     <span className="wave" style={{ height: 14, display: 'inline-flex', gap: 3 }}>
                       <span style={{ width: 4, height: 8, background: '#3E5B41', borderRadius: 2 }} />
                       <span style={{ width: 4, height: 12, background: '#3E5B41', borderRadius: 2 }} />
@@ -154,6 +224,47 @@ export function ChatIntakePage() {
               </div>
             )}
             <div ref={messagesEndRef} />
+          </div>
+
+          {/* User-Controlled Submission & Escalation CTA Banner */}
+          <div
+            style={{
+              margin: '12px 0',
+              padding: '12px 16px',
+              borderRadius: 12,
+              background: '#F5EFE6',
+              border: '1px solid var(--v-border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#26362A' }}>
+                Ready to submit and get connected?
+              </div>
+              <div style={{ fontSize: 11.5, color: '#6B5F4C' }}>
+                You can submit now or continue writing more details below.
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn"
+              onClick={handleFinishAssessment}
+              disabled={loading || isTyping}
+              style={{
+                background: 'var(--v-sys-bubble)',
+                color: '#26362A',
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 800,
+                borderRadius: 8,
+              }}
+            >
+              {loading ? 'Submitting…' : 'Finish & Connect →'}
+            </button>
           </div>
 
           <div className="chat-input">
@@ -173,7 +284,7 @@ export function ChatIntakePage() {
               type="button"
               onClick={handleSend}
               aria-label="Send message"
-              disabled={loading || !inputText.trim()}
+              disabled={loading || isTyping || !inputText.trim()}
             >
               ➤
             </button>

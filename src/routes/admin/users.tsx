@@ -159,60 +159,62 @@ function UsersManagementPage() {
         />
       </div>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="case-table">
-          <thead>
-            <tr>
-              <th>User Name</th>
-              <th>Email Address</th>
-              <th>Assigned Role</th>
-              <th>Department / Agency</th>
-              <th>District</th>
-              <th>Status</th>
-              <th>Last Active</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <b>{u.name}</b>
-                </td>
-                <td style={{ color: 'var(--a-muted)' }}>{u.email}</td>
-                <td>
-                  <span
-                    className="tag"
-                    style={{
-                      borderColor:
-                        u.role === 'Law Enforcement'
-                          ? 'var(--a-accent)'
-                          : u.role === 'Counsellor'
-                            ? 'var(--a-low)'
-                            : 'var(--a-high)',
-                      color: '#fff',
-                    }}
-                  >
-                    {u.role}
-                  </span>
-                </td>
-                <td style={{ fontSize: 12.5 }}>{u.department}</td>
-                <td>{u.district}</td>
-                <td>
-                  <span
-                    className="tag"
-                    style={{
-                      color: u.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
-                      borderColor: u.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
-                    }}
-                  >
-                    {u.status}
-                  </span>
-                </td>
-                <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{u.lastActive}</td>
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="case-table">
+            <thead>
+              <tr>
+                <th>User Name</th>
+                <th>Email Address</th>
+                <th>Assigned Role</th>
+                <th>Department / Agency</th>
+                <th>District</th>
+                <th>Status</th>
+                <th>Last Active</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((u) => (
+                <tr key={u.id}>
+                  <td>
+                    <b>{u.name}</b>
+                  </td>
+                  <td style={{ color: 'var(--a-muted)' }}>{u.email}</td>
+                  <td>
+                    <span
+                      className="tag"
+                      style={{
+                        borderColor:
+                          u.role === 'Law Enforcement'
+                            ? 'var(--a-accent)'
+                            : u.role === 'Counsellor'
+                              ? 'var(--a-low)'
+                              : 'var(--a-high)',
+                        color: '#fff',
+                      }}
+                    >
+                      {u.role}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: 12.5 }}>{u.department}</td>
+                  <td>{u.district}</td>
+                  <td>
+                    <span
+                      className="tag"
+                      style={{
+                        color: u.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
+                        borderColor: u.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
+                      }}
+                    >
+                      {u.status}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{u.lastActive}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {modalOpen && (

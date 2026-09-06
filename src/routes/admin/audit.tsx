@@ -165,72 +165,74 @@ function AuditLogViewerPage() {
         />
       </div>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="case-table">
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Actor &amp; Role</th>
-              <th>Action Conducted</th>
-              <th>Target / Record</th>
-              <th>Category</th>
-              <th>IP Origin</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => (
-              <tr key={item.id}>
-                <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{item.timestamp}</td>
-                <td>
-                  <b>{item.actor}</b>
-                  <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>{item.role}</div>
-                </td>
-                <td>
-                  {item.action.includes('→') ? (
-                    <div>
-                      <span>{item.action.split('(')[0]}</span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 6 }}>
-                        <span style={{ background: 'rgba(224,88,79,0.2)', color: 'var(--a-critical)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
-                          {item.action.split('(')[1]?.split('→')[0]?.trim()}
-                        </span>
-                        <span>→</span>
-                        <span style={{ background: 'rgba(111,162,135,0.2)', color: 'var(--a-low)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
-                          {item.action.split('→')[1]?.replace(')', '').trim()}
-                        </span>
-                      </span>
-                    </div>
-                  ) : (
-                    <span>{item.action}</span>
-                  )}
-                </td>
-                <td>
-                  <span className="tag" style={{ color: 'var(--a-text)', fontFamily: 'monospace' }}>
-                    {item.target}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    className="tag"
-                    style={{
-                      borderColor:
-                        item.category === 'Dispatch'
-                          ? 'var(--a-critical)'
-                          : item.category === 'Case Access'
-                            ? 'var(--a-accent)'
-                            : 'var(--a-border)',
-                      color: '#fff',
-                    }}
-                  >
-                    {item.category}
-                  </span>
-                </td>
-                <td style={{ fontSize: 11.5, color: 'var(--a-muted)', fontFamily: 'monospace' }}>
-                  {item.ipAddress}
-                </td>
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="case-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Actor &amp; Role</th>
+                <th>Action Conducted</th>
+                <th>Target / Record</th>
+                <th>Category</th>
+                <th>IP Origin</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((item) => (
+                <tr key={item.id}>
+                  <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{item.timestamp}</td>
+                  <td>
+                    <b>{item.actor}</b>
+                    <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>{item.role}</div>
+                  </td>
+                  <td>
+                    {item.action.includes('→') ? (
+                      <div>
+                        <span>{item.action.split('(')[0]}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginLeft: 6 }}>
+                          <span style={{ background: 'rgba(224,88,79,0.2)', color: 'var(--a-critical)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
+                            {item.action.split('(')[1]?.split('→')[0]?.trim()}
+                          </span>
+                          <span>→</span>
+                          <span style={{ background: 'rgba(111,162,135,0.2)', color: 'var(--a-low)', padding: '1px 6px', borderRadius: 4, fontSize: 11 }}>
+                            {item.action.split('→')[1]?.replace(')', '').trim()}
+                          </span>
+                        </span>
+                      </div>
+                    ) : (
+                      <span>{item.action}</span>
+                    )}
+                  </td>
+                  <td>
+                    <span className="tag" style={{ color: 'var(--a-text)', fontFamily: 'monospace' }}>
+                      {item.target}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      className="tag"
+                      style={{
+                        borderColor:
+                          item.category === 'Dispatch'
+                            ? 'var(--a-critical)'
+                            : item.category === 'Case Access'
+                              ? 'var(--a-accent)'
+                              : 'var(--a-border)',
+                        color: '#fff',
+                      }}
+                    >
+                      {item.category}
+                    </span>
+                  </td>
+                  <td style={{ fontSize: 11.5, color: 'var(--a-muted)', fontFamily: 'monospace' }}>
+                    {item.ipAddress}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <p className="inline-legend" style={{ marginTop: 14 }}>

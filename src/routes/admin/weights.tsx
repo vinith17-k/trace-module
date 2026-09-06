@@ -85,62 +85,64 @@ function SviWeightsPage() {
         SVI Formula: <b style={{ color: 'var(--a-text)' }}>SVI = ∑ (Weight_i × SignalScore_i)</b>. Each signal has a minimum confidence floor below which its contribution is capped to prevent false escalations.
       </p>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="config-table">
-          <thead>
-            <tr>
-              <th>Signal Type</th>
-              <th style={{ width: 140 }}>Weight (0.00 - 1.00)</th>
-              <th style={{ width: 140 }}>Confidence Floor</th>
-              <th>Technical Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {weights.map((row, idx) => (
-              <tr key={row.key}>
-                <td>
-                  <b>{row.signal}</b>
-                </td>
-                <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <input
-                      type="range"
-                      step="0.05"
-                      min="0"
-                      max="1"
-                      style={{ width: 80, accentColor: 'var(--a-accent)' }}
-                      value={row.weight}
-                      onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
-                    />
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="config-table">
+            <thead>
+              <tr>
+                <th>Signal Type</th>
+                <th style={{ width: 140 }}>Weight (0.00 - 1.00)</th>
+                <th style={{ width: 140 }}>Confidence Floor</th>
+                <th>Technical Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weights.map((row, idx) => (
+                <tr key={row.key}>
+                  <td>
+                    <b>{row.signal}</b>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        type="range"
+                        step="0.05"
+                        min="0"
+                        max="1"
+                        style={{ width: 80, accentColor: 'var(--a-accent)' }}
+                        value={row.weight}
+                        onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
+                      />
+                      <input
+                        type="number"
+                        step="0.05"
+                        min="0"
+                        max="1"
+                        className="weight-input"
+                        style={{ width: 62 }}
+                        value={row.weight}
+                        onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
+                      />
+                    </div>
+                  </td>
+                  <td>
                     <input
                       type="number"
                       step="0.05"
                       min="0"
                       max="1"
-                      className="weight-input"
-                      style={{ width: 62 }}
-                      value={row.weight}
-                      onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
+                      value={row.floor}
+                      onChange={(e) => handleFloorChange(idx, parseFloat(e.target.value) || 0)}
                     />
-                  </div>
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="0"
-                    max="1"
-                    value={row.floor}
-                    onChange={(e) => handleFloorChange(idx, parseFloat(e.target.value) || 0)}
-                  />
-                </td>
-                <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>
-                  {row.description}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </td>
+                  <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>
+                    {row.description}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 14 }}>

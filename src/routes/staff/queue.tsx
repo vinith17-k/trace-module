@@ -118,7 +118,7 @@ function CaseQueuePage() {
             onChange={(e) => setSortBy(e.target.value as any)}
             aria-label="Sort cases"
           >
-            <option value="risk">Sort: Severity (High $\rightarrow$ Low)</option>
+            <option value="risk">Sort: Severity (High → Low)</option>
             <option value="sla">Sort: Urgent SLA countdown</option>
             <option value="time">Sort: Most recent</option>
           </select>
@@ -144,88 +144,94 @@ function CaseQueuePage() {
         </span>
       </div>
 
-      <table className="case-table">
-        <thead>
-          <tr>
-            <th>Ref ID</th>
-            <th>SVI Risk</th>
-            <th>SLA Status</th>
-            <th>Trauma Indicators</th>
-            <th>Channel</th>
-            <th>Elapsed</th>
-            <th>Action Status</th>
-            <th aria-hidden="true" />
-          </tr>
-        </thead>
-        <tbody>
-          {filteredCases.map((c) => (
-            <tr
-              key={c.id}
-              className="case-row-btn"
-              tabIndex={0}
-              role="button"
-              aria-label={`Open case ${c.refId}, ${c.risk} risk, ${c.status}`}
-              onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate({ to: '/staff/case/$id', params: { id: c.refId } });
-                }
-              }}
-            >
-              <td>
-                <b>{c.refId}</b>
-                <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>Score: {c.score}/100</div>
-              </td>
-              <td>
-                <BadgeRisk level={c.risk} />
-              </td>
-              <td>
-                {c.status === 'Resolved' ? (
-                  <span style={{ fontSize: 12, color: 'var(--a-low)' }}>✓ Completed</span>
-                ) : c.slaMinutesLeft <= 5 ? (
-                  <span
-                    style={{
-                      fontSize: 11.5,
-                      fontWeight: 800,
-                      color: 'var(--a-critical)',
-                      background: 'rgba(224,88,79,0.15)',
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                    }}
-                  >
-                    ⚠️ SLA: {c.slaMinutesLeft}m left
-                  </span>
-                ) : (
-                  <span style={{ fontSize: 12, color: 'var(--a-muted)' }}>
-                    ⏱ {c.slaMinutesLeft}m left
-                  </span>
-                )}
-              </td>
-              <td>
-                {c.indicators.map((ind) => (
-                  <span key={ind} className="tag">
-                    {ind}
-                  </span>
-                ))}
-              </td>
-              <td>{c.channel}</td>
-              <td>{c.since}</td>
-              <td>{c.status}</td>
-              <td className="row-chevron" aria-hidden="true">
-                ›
-              </td>
-            </tr>
-          ))}
-          {filteredCases.length === 0 && (
+      <div className="table-responsive">
+        <table className="case-table">
+          <thead>
             <tr>
-              <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
-                No cases match the selected filter.
-              </td>
+              <th>Ref ID</th>
+              <th>SVI Risk</th>
+              <th>SLA Status</th>
+              <th>Trauma Indicators</th>
+              <th>Channel</th>
+              <th>Elapsed</th>
+              <th>Action Status</th>
+              <th aria-hidden="true" />
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredCases.map((c) => (
+              <tr
+                key={c.id}
+                className="case-row-btn"
+                tabIndex={0}
+                role="button"
+                aria-label={`Open case ${c.refId}, ${c.risk} risk, ${c.status}`}
+                onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate({ to: '/staff/case/$id', params: { id: c.refId } });
+                  }
+                }}
+              >
+                <td>
+                  <b>{c.refId}</b>
+                  <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>Score: {c.score}/100</div>
+                </td>
+                <td>
+                  <BadgeRisk level={c.risk} />
+                </td>
+                <td>
+                  {c.status === 'Resolved' ? (
+                    <span style={{ fontSize: 12, color: 'var(--a-low)' }}>✓ Completed</span>
+                  ) : c.slaMinutesLeft <= 5 ? (
+                    <span
+                      style={{
+                        fontSize: 11.5,
+                        fontWeight: 800,
+                        color: 'var(--a-critical)',
+                        background: 'rgba(224,88,79,0.15)',
+                        padding: '3px 8px',
+                        borderRadius: 6,
+                      }}
+                    >
+                      ⚠️ SLA: {c.slaMinutesLeft}m left
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 12, color: 'var(--a-muted)' }}>
+                      ⏱ {c.slaMinutesLeft}m left
+                    </span>
+                  )}
+                </td>
+                <td>
+                  {c.indicators.map((ind) => (
+                    <span key={ind} className="tag">
+                      {ind}
+                    </span>
+                  ))}
+                </td>
+                <td>{c.channel}</td>
+                <td>{c.since}</td>
+                <td>
+                  <span className={`badge ${c.status === 'Resolved' ? 'low' : c.status === 'Dispatched' ? 'high' : 'moderate'}`}>
+                    {c.status}
+                  </span>
+                </td>
+                <td className="row-chevron" aria-hidden="true">
+                  ›
+                </td>
+              </tr>
+            ))}
+            {filteredCases.length === 0 && (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
+                  No cases match the selected filter.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </StaffLayout>
   );
 }

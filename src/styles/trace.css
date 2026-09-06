@@ -30,7 +30,7 @@
   --a-panel2: #262F3B;
   --a-border: #323D4A;
   --a-text: #E7EAEE;
-  --a-muted: #AEB9C7;
+  --a-muted: #CBD5E1;
   --a-accent: #5B8DEF;
   --focus-ring: #5B8DEF;
   --a-critical: #E0584F;
@@ -184,6 +184,44 @@
 .pub-nav .emerg {
   color: var(--pub-terracotta);
   opacity: 1;
+}
+.pub-mobile-toggle {
+  display: none;
+  background: none;
+  border: 1px solid #D4CCC0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: var(--pub-ink);
+  font-size: 14px;
+  font-weight: 700;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 768px) {
+  .pub-nav { display: none; }
+  .pub-mobile-toggle { display: inline-flex; }
+}
+.pub-mobile-drawer {
+  background: #FFFDF9;
+  border-bottom: 1px solid #E8E1D2;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+}
+.pub-mobile-drawer a {
+  color: var(--pub-ink);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 0;
+  border-bottom: 1px solid #F1ECE0;
+}
+.pub-mobile-drawer a.emerg {
+  color: var(--pub-terracotta);
+  font-weight: 700;
 }
 .pub-hero {
   padding: 64px 32px 80px;
@@ -1028,10 +1066,38 @@
   .pub-header, .pub-hero, .pub-trust { padding-left: 20px; padding-right: 20px; }
   .pub-strip .wrap { grid-template-columns: 1fr; }
   .pub-footer .wrap { grid-template-columns: 1fr; gap: 22px; }
+  .pub-body { padding: 32px 18px; }
+  .pub-body h1 { font-size: clamp(26px, 5.5vw, 36px); }
   .v-stage { padding: 0 14px 40px; }
   .v-card { padding: 24px 20px; }
   .auth-main { padding: 18px 16px; }
   .stat-cards { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 640px) {
+  .proto-full-lbl { display: inline !important; }
+  .proto-short-lbl { display: none !important; }
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: inherit;
+}
+
+/* Full-Screen Emergency Modal Backdrop */
+.emergency-backdrop-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(18, 23, 30, 0.84);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
 }
 
 /* Accessibility focus rings */
@@ -1068,9 +1134,15 @@ textarea:focus-visible,
 }
 .skip-link:focus { left: 0; }
 
-button:disabled, .btn:disabled {
-  opacity: .45;
+button:disabled,
+.btn:disabled,
+.btn-dash:disabled,
+.btn-danger:disabled,
+.btn-ghost:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
+  filter: grayscale(0.65);
+  pointer-events: none;
 }
 
 .tel-link {

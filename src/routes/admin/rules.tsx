@@ -76,45 +76,47 @@ function RecommendationRulesPage() {
       </div>
 
       <p className="inline-legend" style={{ margin: '0 0 16px', display: 'inline-block' }}>
-        The TRACE pipeline matches incoming victim signals against these rules in order of precedence (Critical $\rightarrow$ High $\rightarrow$ Moderate $\rightarrow$ Low).
+        The TRACE pipeline matches incoming victim signals against these rules in order of precedence (Critical → High → Moderate → Low).
       </p>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="case-table">
-          <thead>
-            <tr>
-              <th>Risk + Indicator Trigger</th>
-              <th>Dispatch Action</th>
-              <th>Mandated Authority</th>
-              <th>SLA Priority</th>
-              <th style={{ width: 80 }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rules.map((r) => (
-              <tr key={r.id}>
-                <td>
-                  <b>{r.trigger}</b>
-                </td>
-                <td>{r.action}</td>
-                <td style={{ fontSize: 12.5, color: 'var(--a-muted)' }}>{r.authority}</td>
-                <td>
-                  <BadgeRisk level={r.priority} label={r.priorityLabel} />
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn-ghost"
-                    style={{ padding: '4px 8px', fontSize: 11, color: 'var(--a-critical)' }}
-                    onClick={() => handleDeleteRule(r.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="case-table">
+            <thead>
+              <tr>
+                <th>Risk + Indicator Trigger</th>
+                <th>Dispatch Action</th>
+                <th>Mandated Authority</th>
+                <th>SLA Priority</th>
+                <th style={{ width: 80 }}>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rules.map((r) => (
+                <tr key={r.id}>
+                  <td>
+                    <b>{r.trigger}</b>
+                  </td>
+                  <td>{r.action}</td>
+                  <td style={{ fontSize: 12.5, color: 'var(--a-muted)' }}>{r.authority}</td>
+                  <td>
+                    <BadgeRisk level={r.priority} label={r.priorityLabel} />
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn-ghost"
+                      style={{ padding: '4px 8px', fontSize: 11, color: 'var(--a-critical)' }}
+                      onClick={() => handleDeleteRule(r.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {modalOpen && (

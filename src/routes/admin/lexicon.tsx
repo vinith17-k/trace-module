@@ -134,45 +134,47 @@ function RiskLexiconPage() {
         />
       </div>
 
-      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="case-table">
-          <thead>
-            <tr>
-              <th>Phrase Category</th>
-              <th>Language</th>
-              <th>Weight (0–1.0)</th>
-              <th>Pattern Sample (Masked Preview)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <b>{item.category}</b>
-                </td>
-                <td>
-                  <span className="tag">{item.language}</span>
-                </td>
-                <td>{item.weight.toFixed(2)}</td>
-                <td style={{ fontSize: 13, color: 'var(--a-text)', fontFamily: 'monospace' }}>
-                  {item.phraseSample}
-                </td>
-                <td>
-                  <span
-                    className="tag"
-                    style={{
-                      color: item.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
-                      borderColor: item.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
-                    }}
-                  >
-                    {item.status}
-                  </span>
-                </td>
+      <div className="panel" style={{ padding: 0 }}>
+        <div className="table-responsive">
+          <table className="case-table">
+            <thead>
+              <tr>
+                <th>Phrase Category</th>
+                <th>Language</th>
+                <th>Weight (0–1.0)</th>
+                <th>Pattern Sample (Masked Preview)</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <b>{item.category}</b>
+                  </td>
+                  <td>
+                    <span className="tag">{item.language}</span>
+                  </td>
+                  <td>{item.weight.toFixed(2)}</td>
+                  <td style={{ fontSize: 13, color: 'var(--a-text)', fontFamily: 'monospace' }}>
+                    {item.phraseSample}
+                  </td>
+                  <td>
+                    <span
+                      className="tag"
+                      style={{
+                        color: item.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
+                        borderColor: item.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
+                      }}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {modalOpen && (

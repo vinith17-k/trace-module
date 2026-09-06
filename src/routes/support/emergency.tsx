@@ -28,7 +28,12 @@ function EmergencyOverlayPage() {
         </div>
 
         {/* Modal panel */}
-        <div className="overlay-backdrop">
+        <div
+          className="emergency-backdrop-fixed"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Emergency Help Options"
+        >
           <div className="emergency-panel">
             <h3>We're here to help right now</h3>
             <p>

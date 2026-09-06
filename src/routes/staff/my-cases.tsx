@@ -22,45 +22,47 @@ function MyCasesPage() {
         <span className="auth-role">Counsellor · Priya S.</span>
       </div>
 
-      <table className="case-table">
-        <thead>
-          <tr>
-            <th>Ref ID</th>
-            <th>Risk</th>
-            <th>Last contact</th>
-            <th>Status</th>
-            <th aria-hidden="true" />
-          </tr>
-        </thead>
-        <tbody>
-          {MY_CASES.map((c) => (
-            <tr
-              key={c.refId}
-              className="case-row-btn"
-              tabIndex={0}
-              role="button"
-              aria-label={`Open case ${c.refId}`}
-              onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  navigate({ to: '/staff/case/$id', params: { id: c.refId } });
-                }
-              }}
-            >
-              <td><b>{c.refId}</b></td>
-              <td>
-                <BadgeRisk level={c.risk} />
-              </td>
-              <td>{c.lastContact}</td>
-              <td>{c.status}</td>
-              <td className="row-chevron" aria-hidden="true">
-                ›
-              </td>
+      <div className="table-responsive">
+        <table className="case-table">
+          <thead>
+            <tr>
+              <th>Ref ID</th>
+              <th>Risk</th>
+              <th>Last contact</th>
+              <th>Status</th>
+              <th aria-hidden="true" />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {MY_CASES.map((c) => (
+              <tr
+                key={c.refId}
+                className="case-row-btn"
+                tabIndex={0}
+                role="button"
+                aria-label={`Open case ${c.refId}`}
+                onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate({ to: '/staff/case/$id', params: { id: c.refId } });
+                  }
+                }}
+              >
+                <td><b>{c.refId}</b></td>
+                <td>
+                  <BadgeRisk level={c.risk} />
+                </td>
+                <td>{c.lastContact}</td>
+                <td>{c.status}</td>
+                <td className="row-chevron" aria-hidden="true">
+                  ›
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </StaffLayout>
   );
 }

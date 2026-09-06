@@ -7,6 +7,7 @@ interface Props {
 
 export function PublicLayout({ children }: Props) {
   const [portalOpen, setPortalOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -26,6 +27,17 @@ export function PublicLayout({ children }: Props) {
           <span className="dot" />
           TRACE
         </Link>
+
+        {/* Mobile menu toggle */}
+        <button
+          type="button"
+          className="pub-mobile-toggle"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? '✕ Close' : '☰ Menu'}
+        </button>
 
         <nav className="pub-nav">
           <a className="tel-link emerg" href="tel:14566" style={{ fontWeight: 800 }}>
@@ -162,6 +174,45 @@ export function PublicLayout({ children }: Props) {
           </Link>
         </nav>
       </header>
+
+      {/* Mobile Drawer Menu */}
+      {mobileOpen && (
+        <div className="pub-mobile-drawer" role="dialog" aria-label="Mobile Navigation Menu">
+          <a className="tel-link emerg" href="tel:14566" style={{ fontWeight: 800 }}>
+            📞 24/7 Helpline: 14566
+          </a>
+          <Link to="/about" onClick={() => setMobileOpen(false)}>How it works</Link>
+          <Link to="/resources" onClick={() => setMobileOpen(false)}>Resources</Link>
+          <Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link>
+          <div style={{ height: 1, background: '#E8E1D2', margin: '4px 0' }} />
+          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--pub-ink)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Staff &amp; Authority Portals
+          </div>
+          <Link to="/staff/login" onClick={() => setMobileOpen(false)}>🔐 Staff Login</Link>
+          <Link to="/staff/queue" onClick={() => setMobileOpen(false)}>🩺 Counsellor Queue</Link>
+          <Link to="/staff/police" onClick={() => setMobileOpen(false)}>👮 Police &amp; Escorts</Link>
+          <Link to="/admin" onClick={() => setMobileOpen(false)}>⚙️ Administration</Link>
+          <Link
+            to="/support"
+            className="btn emerg"
+            style={{
+              background: 'var(--pub-terracotta)',
+              color: '#fff',
+              padding: '12px 16px',
+              fontSize: 14,
+              fontWeight: 700,
+              borderRadius: 8,
+              textAlign: 'center',
+              justifyContent: 'center',
+              marginTop: 6,
+              textDecoration: 'none',
+            }}
+            onClick={() => setMobileOpen(false)}
+          >
+            Get support now
+          </Link>
+        </div>
+      )}
 
       {children}
 

@@ -102,7 +102,17 @@ export function PrototypeNavigator() {
               display: 'inline-block',
             }}
           />
-          {isOpen ? '✕ Close Navigator' : '⚡ Prototype Navigator (26 Screens)'}
+          {isOpen ? (
+            '✕ Close'
+          ) : (
+            <>
+              <span>⚡</span>
+              <span>
+                <span className="proto-full-lbl" style={{ display: 'none' }}>Prototype Navigator (26 Screens)</span>
+                <span className="proto-short-lbl">Screens (26)</span>
+              </span>
+            </>
+          )}
         </button>
       </div>
 

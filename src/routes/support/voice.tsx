@@ -77,7 +77,7 @@ export function VoiceIntakePage() {
   return (
     <VictimLayout>
       <div className="v-stage">
-        <div className="v-card" style={{ textAlign: 'center' }}>
+        <div className="v-card">
           <button
             type="button"
             className="v-back"
@@ -86,10 +86,10 @@ export function VoiceIntakePage() {
           >
             ← Back
           </button>
-          <div className="v-title" style={{ textAlign: 'left' }}>
+          <div className="v-title">
             Speak whenever you're ready
           </div>
-          <p className="v-lead" style={{ textAlign: 'left' }}>
+          <p className="v-lead">
             There's no rush. Say as much or as little as you'd like.
           </p>
 

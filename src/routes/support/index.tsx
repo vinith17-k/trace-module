@@ -28,12 +28,25 @@ function ConsentPage() {
             We'll read or listen to what you share, and gently note signs of distress. A counsellor may see this to help you. You can stop at any time.
           </p>
 
-          <div className="consent-row" role="radiogroup" aria-label="Consent choice">
+          <div
+            className="consent-row"
+            role="radiogroup"
+            aria-label="Consent choice"
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                setConsent((prev) => (prev === 'named' ? 'anonymous' : 'named'));
+              }
+            }}
+          >
             <div
               className={`choice-card ${consent === 'named' ? 'selected' : ''}`}
               onClick={() => setConsent('named')}
               onKeyDown={(e) => {
-                if (e.key === ' ' || e.key === 'Enter') setConsent('named');
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault();
+                  setConsent('named');
+                }
               }}
               tabIndex={0}
               role="radio"
@@ -47,7 +60,10 @@ function ConsentPage() {
               className={`choice-card ${consent === 'anonymous' ? 'selected' : ''}`}
               onClick={() => setConsent('anonymous')}
               onKeyDown={(e) => {
-                if (e.key === ' ' || e.key === 'Enter') setConsent('anonymous');
+                if (e.key === ' ' || e.key === 'Enter') {
+                  e.preventDefault();
+                  setConsent('anonymous');
+                }
               }}
               tabIndex={0}
               role="radio"

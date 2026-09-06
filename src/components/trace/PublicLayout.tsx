@@ -13,14 +13,22 @@ export function PublicLayout({ children }: Props) {
           <span className="dot" />
           TRACE
         </Link>
-        <nav className="pub-nav">
+        <nav className="pub-nav" style={{ flexWrap: 'wrap', gap: 20 }}>
           <a className="tel-link emerg" href="tel:14566" style={{ fontWeight: 800 }}>
             📞 Need help now? Call 14566
           </a>
           <Link to="/about">How it works</Link>
           <Link to="/resources">Resources</Link>
-          <Link to="/contact">Contact</Link>
-          <Link to="/support" className="emerg">
+          <Link to="/staff/queue" style={{ color: 'var(--pub-ink)' }}>
+            🩺 Counsellor
+          </Link>
+          <Link to="/staff/police" style={{ color: 'var(--pub-ink)' }}>
+            👮 Police Dept
+          </Link>
+          <Link to="/admin" style={{ color: 'var(--pub-ink)' }}>
+            ⚙️ Admin
+          </Link>
+          <Link to="/support" className="emerg" style={{ fontWeight: 800 }}>
             Get support now
           </Link>
         </nav>

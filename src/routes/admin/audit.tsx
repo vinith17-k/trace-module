@@ -1,80 +1,228 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
 import { StaffLayout } from '@/components/trace/StaffLayout';
+import { Toast } from '@/components/trace/Toast';
 
 export const Route = createFileRoute('/admin/audit')({
   component: AuditLogViewerPage,
 });
 
-const AUDIT_DATA = [
-  { actor: 'Priya S.', action: 'viewed case NHAA-4F82-K91', time: '2 min ago' },
-  { actor: 'System', action: 'dispatched notification to Police (Pune) for NHAA-4F82-K91', time: '4 min ago' },
-  { actor: 'Admin (R. Iyer)', action: 'updated SVI weight for acoustic pitch variance (0.15 → 0.20)', time: '1 hr ago' },
-  { actor: 'Rakesh Y.', action: 'acknowledged case NHAA-3D88-R21', time: '3 hr ago' },
-  { actor: 'System', action: 'soft-deleted duplicate record for NHAA-1A02-Z10', time: '1 day ago' },
-  { actor: 'Anita D.', action: 'reviewed intake audio recording for NHAA-9A73-L02', time: '2 days ago' },
+interface AuditLogEntry {
+  id: string;
+  actor: string;
+  role: string;
+  action: string;
+  target: string;
+  category: 'Case Access' | 'Dispatch' | 'Config' | 'Auth';
+  timestamp: string;
+  ipAddress: string;
+}
+
+const INITIAL_AUDIT_LOG: AuditLogEntry[] = [
+  {
+    id: '1',
+    actor: 'Priya S.',
+    role: 'Counsellor',
+    action: 'Viewed Case & Revealed Transcript',
+    target: 'NHAA-4F82-K91',
+    category: 'Case Access',
+    timestamp: '2 min ago',
+    ipAddress: '10.14.88.21',
+  },
+  {
+    id: '2',
+    actor: 'System (Pipeline)',
+    role: 'Automated Worker',
+    action: 'Dispatched Armed Police Protection Outbox',
+    target: 'NHAA-4F82-K91 → Police Pune',
+    category: 'Dispatch',
+    timestamp: '4 min ago',
+    ipAddress: '127.0.0.1',
+  },
+  {
+    id: '3',
+    actor: 'SI Rakesh Yadav',
+    role: 'Law Enforcement',
+    action: 'Updated Incident Status to "En Route"',
+    target: 'NHAA-4F82-K91 (PCR-14)',
+    category: 'Dispatch',
+    timestamp: '8 min ago',
+    ipAddress: '10.14.92.10',
+  },
+  {
+    id: '4',
+    actor: 'Admin (R. Iyer)',
+    role: 'System Admin',
+    action: 'Updated SVI Weight for Acoustic Pitch Variance (0.15 → 0.20)',
+    target: 'svi_weights',
+    category: 'Config',
+    timestamp: '1 hr ago',
+    ipAddress: '10.20.10.4',
+  },
+  {
+    id: '5',
+    actor: 'Rakesh Y.',
+    role: 'Law Enforcement',
+    action: 'Acknowledged Police Intervention Notice',
+    target: 'NHAA-3D88-R21',
+    category: 'Dispatch',
+    timestamp: '3 hr ago',
+    ipAddress: '10.14.92.10',
+  },
+  {
+    id: '6',
+    actor: 'System',
+    role: 'Automated Worker',
+    action: 'Soft-deleted duplicate test record',
+    target: 'NHAA-1A02-Z10',
+    category: 'Config',
+    timestamp: '1 day ago',
+    ipAddress: '127.0.0.1',
+  },
+  {
+    id: '7',
+    actor: 'Admin (R. Iyer)',
+    role: 'System Admin',
+    action: 'Invited New Officer Inspector S. Gaikwad',
+    target: 's.gaikwad@police.mh.gov.in',
+    category: 'Auth',
+    timestamp: '1 day ago',
+    ipAddress: '10.20.10.4',
+  },
 ];
 
 function AuditLogViewerPage() {
+  const [logs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOG);
+  const [categoryFilter, setCategoryFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const [range, setRange] = useState('Last 24 hours');
+  const [dateRange, setDateRange] = useState('Last 24 hours');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
-    if (!search.trim()) return AUDIT_DATA;
-    const q = search.toLowerCase();
-    return AUDIT_DATA.filter(
-      (item) =>
+    return logs.filter((item) => {
+      const matchCat = categoryFilter === 'All' || item.category === categoryFilter;
+      const q = search.toLowerCase();
+      const matchSearch =
+        !q ||
         item.actor.toLowerCase().includes(q) ||
         item.action.toLowerCase().includes(q) ||
-        item.time.toLowerCase().includes(q)
-    );
-  }, [search]);
+        item.target.toLowerCase().includes(q) ||
+        item.ipAddress.includes(q);
+      return matchCat && matchSearch;
+    });
+  }, [logs, categoryFilter, search]);
+
+  const handleExport = () => {
+    setToastMessage(`Exported ${filtered.length} audit records to compliance CSV.`);
+  };
 
   return (
     <StaffLayout mode="admin">
       <div className="auth-topline">
-        <h2>Audit Log Viewer</h2>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <select
-            className="search-box"
-            style={{ maxWidth: 140 }}
-            aria-label="Date range"
-            value={range}
-            onChange={(e) => setRange(e.target.value)}
-          >
-            <option>Last 24 hours</option>
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-            <option>All time</option>
-          </select>
-
-          <input
-            className="search-box"
-            id="auditSearch"
-            placeholder="Search actor, case, or action…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search audit log"
-          />
+        <div>
+          <h2>Compliance Audit Log Viewer</h2>
+          <p style={{ fontSize: 12.5, color: 'var(--a-muted)', margin: '4px 0 0' }}>
+            Immutable, tamper-evident record of all case accesses, transcript reveals, dispatches, and configuration edits
+          </p>
         </div>
+        <button type="button" className="btn-dash" onClick={handleExport}>
+          📥 Export Audit CSV
+        </button>
       </div>
 
-      <p className="inline-legend" style={{ margin: '0 0 16px', display: 'inline-block' }}>
-        Append-only tamper-evident event log recording all case views, triage dispatches, and parameter modifications.
+      <div className="filter-row">
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {['All', 'Case Access', 'Dispatch', 'Config', 'Auth'].map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className={`chip ${categoryFilter === cat ? 'on' : ''}`}
+              onClick={() => setCategoryFilter(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <select
+          className="search-box"
+          style={{ maxWidth: 140 }}
+          value={dateRange}
+          onChange={(e) => setDateRange(e.target.value)}
+          aria-label="Date range"
+        >
+          <option>Last 24 hours</option>
+          <option>Last 7 days</option>
+          <option>Last 30 days</option>
+          <option>All time</option>
+        </select>
+
+        <input
+          className="search-box"
+          placeholder="Filter by actor, case, or action…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="panel" style={{ padding: 0, overflow: 'hidden' }}>
+        <table className="case-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Actor &amp; Role</th>
+              <th>Action Conducted</th>
+              <th>Target / Record</th>
+              <th>Category</th>
+              <th>IP Origin</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((item) => (
+              <tr key={item.id}>
+                <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{item.timestamp}</td>
+                <td>
+                  <b>{item.actor}</b>
+                  <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>{item.role}</div>
+                </td>
+                <td>{item.action}</td>
+                <td>
+                  <span className="tag" style={{ color: 'var(--a-text)', fontFamily: 'monospace' }}>
+                    {item.target}
+                  </span>
+                </td>
+                <td>
+                  <span
+                    className="tag"
+                    style={{
+                      borderColor:
+                        item.category === 'Dispatch'
+                          ? 'var(--a-critical)'
+                          : item.category === 'Case Access'
+                            ? 'var(--a-accent)'
+                            : 'var(--a-border)',
+                      color: '#fff',
+                    }}
+                  >
+                    {item.category}
+                  </span>
+                </td>
+                <td style={{ fontSize: 11.5, color: 'var(--a-muted)', fontFamily: 'monospace' }}>
+                  {item.ipAddress}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="inline-legend" style={{ marginTop: 14 }}>
+        🔒 All audit records are write-once append-only in Postgres with trigger verification to satisfy statutory court evidence submission criteria.
       </p>
 
-      <div id="auditLogList" className="panel">
-        {filtered.map((item, idx) => (
-          <div key={idx} className="audit-item">
-            <b>{item.actor}</b> {item.action} · {item.time}
-          </div>
-        ))}
-        {filtered.length === 0 && (
-          <p style={{ fontSize: 13, color: 'var(--a-muted)', textAlign: 'center', padding: '20px 0' }}>
-            No matching audit entries.
-          </p>
-        )}
-      </div>
+      {toastMessage && (
+        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
+      )}
     </StaffLayout>
   );
 }

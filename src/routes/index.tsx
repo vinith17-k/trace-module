@@ -65,8 +65,8 @@ function PublicHome() {
       <div className="pub-trust">
         <h2>Built with, and for, the people who need it</h2>
         <div className="trust-badges">
-          <div className="trust-badge">Ministry of Social Justice &amp; Empowerment</div>
-          <div className="trust-badge">Data encrypted &amp; confidential</div>
+          <div className="trust-badge">Ministry of Social Justice & Empowerment</div>
+          <div className="trust-badge">Data encrypted & confidential</div>
           <div className="trust-badge">National Helpline Against Atrocities · 14566</div>
           <div className="trust-badge">Available in 8 Indian languages</div>
         </div>

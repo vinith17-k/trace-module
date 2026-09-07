@@ -27,6 +27,7 @@ const INITIAL_RULES: RuleItem[] = [
 ];
 
 function RecommendationRulesPage() {
+  useAuthGuard();
   const [rules, setRules] = useState<RuleItem[]>(INITIAL_RULES);
   const [modalOpen, setModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);

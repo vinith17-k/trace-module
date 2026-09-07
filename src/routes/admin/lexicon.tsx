@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { Toast } from '@/components/trace/Toast';
 
@@ -51,6 +52,7 @@ const INITIAL_LEXICON: LexiconTerm[] = [
 const SUPPORTED_LANGUAGES = ['All', 'English', 'Hindi', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Kannada'];
 
 function RiskLexiconPage() {
+  useAuthGuard();
   const [lexicon, setLexicon] = useState<LexiconTerm[]>(INITIAL_LEXICON);
   const [selectedLang, setSelectedLang] = useState('All');
   const [search, setSearch] = useState('');

@@ -229,45 +229,47 @@ export function ChatIntakePage() {
           </div>
 
           {/* User-Controlled Submission & Escalation CTA Banner */}
-          <div
-            style={{
-              margin: '12px 0',
-              padding: '12px 16px',
-              borderRadius: 12,
-              background: '#F5EFE6',
-              border: '1px solid var(--v-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-              flexWrap: 'wrap',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#26362A' }}>
-                Ready to submit and get connected?
-              </div>
-              <div style={{ fontSize: 11.5, color: '#6B5F4C' }}>
-                You can submit now or continue writing more details below.
-              </div>
-            </div>
-            <button
-              type="button"
-              className="btn"
-              onClick={handleFinishAssessment}
-              disabled={loading || isTyping}
+          {userMessageCount >= 2 && (
+            <div
               style={{
-                background: 'var(--v-sys-bubble)',
-                color: '#26362A',
-                padding: '8px 16px',
-                fontSize: 13,
-                fontWeight: 800,
-                borderRadius: 8,
+                margin: '12px 0',
+                padding: '12px 16px',
+                borderRadius: 12,
+                background: '#F5EFE6',
+                border: '1px solid var(--v-border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                flexWrap: 'wrap',
               }}
             >
-              {loading ? 'Submitting…' : 'Finish & Connect →'}
-            </button>
-          </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#26362A' }}>
+                  Ready to submit and get connected?
+                </div>
+                <div style={{ fontSize: 11.5, color: '#6B5F4C' }}>
+                  You can submit now or continue writing more details below.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn"
+                onClick={handleFinishAssessment}
+                disabled={loading || isTyping}
+                style={{
+                  background: 'var(--v-sys-bubble)',
+                  color: '#26362A',
+                  padding: '8px 16px',
+                  fontSize: 13,
+                  fontWeight: 800,
+                  borderRadius: 8,
+                }}
+              >
+                {loading ? 'Submitting…' : 'Finish & Connect →'}
+              </button>
+            </div>
+          )}
 
           <div className="chat-input">
             <input

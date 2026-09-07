@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { Toast } from '@/components/trace/Toast';
 
@@ -15,6 +16,7 @@ interface NotificationItem {
 }
 
 function EscalationCenterPage() {
+  useAuthGuard();
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     { id: '1', target: 'NHAA-4F82-K91 → Police (Pune Dist.)', priority: 'Immediate', status: 'sent' },
     { id: '2', target: 'NHAA-2C10-B44 → Legal Aid Cell', priority: 'Urgent', status: 'sent' },
@@ -33,7 +35,7 @@ function EscalationCenterPage() {
   return (
     <StaffLayout mode="staff">
       <div className="auth-topline">
-        <h2>Escalation &amp; Notification Center</h2>
+        <h2>Escalation & Notification Center</h2>
         <span className="auth-role">Authority Dispatch</span>
       </div>
 

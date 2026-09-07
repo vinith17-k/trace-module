@@ -107,11 +107,11 @@ function StatusCheckPage() {
             {error && (
               <div
                 style={{
-                  background: 'rgba(224,88,79,0.1)',
-                  border: '1px solid rgba(224,88,79,0.3)',
+                  background: 'var(--v-emergency-bg)',
+                  border: '1px solid rgba(196,89,63,0.35)',
                   padding: '12px 14px',
                   borderRadius: 10,
-                  color: 'var(--a-critical)',
+                  color: 'var(--v-emergency)',
                   fontSize: 13,
                 }}
               >
@@ -128,7 +128,7 @@ function StatusCheckPage() {
             {statusResult && (
               <div
                 style={{
-                  background: '#F7F4EC',
+                  background: 'var(--v-card)',
                   border: '1px solid var(--v-border)',
                   borderRadius: 12,
                   padding: 16,

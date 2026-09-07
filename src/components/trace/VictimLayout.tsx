@@ -15,10 +15,15 @@ export function VictimLayout({
   onSelectLang,
 }: Props) {
   const [currentLang, setCurrentLang] = useState(activeLang);
+  const [langToast, setLangToast] = useState<string | null>(null);
 
   const handleLang = (lang: string) => {
     setCurrentLang(lang);
     if (onSelectLang) onSelectLang(lang);
+    if (lang !== 'English') {
+      setLangToast(`${lang} — मदद जल्द ही उपलब्ध होगी · Support in ${lang} is being added.`);
+      setTimeout(() => setLangToast(null), 5000);
+    }
   };
 
   const handleQuickExit = () => {
@@ -40,6 +45,7 @@ export function VictimLayout({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
 
   return (
     <div className="victim" style={{ minHeight: '100vh', position: 'relative' }}>
@@ -87,6 +93,7 @@ export function VictimLayout({
               boxShadow: '0 2px 8px rgba(196,89,63,0.3)',
             }}
             title="Press Esc or click to leave immediately and clear session"
+            aria-keyshortcuts="Escape"
           >
             <span>✕ Quick Exit</span>
             <kbd
@@ -103,6 +110,33 @@ export function VictimLayout({
         </div>
       </div>
       {children}
+
+      {/* Language selection feedback toast */}
+      {langToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#26362A',
+            color: '#E4EDDF',
+            padding: '12px 20px',
+            borderRadius: 12,
+            fontSize: 13,
+            fontWeight: 600,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+            zIndex: 999,
+            maxWidth: '90vw',
+            textAlign: 'center',
+            lineHeight: 1.5,
+          }}
+        >
+          {langToast}
+        </div>
+      )}
     </div>
   );
 }

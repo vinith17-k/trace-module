@@ -1,133 +1,165 @@
-import React, { useState } from 'react';
-import { 
-  Network, 
-  Calendar, 
-  MessageSquare, 
-  BarChart3, 
-  ShieldCheck, 
-  Clock, 
-  Users, 
-  FileText, 
+import React, { useMemo, useState } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import {
   AlertCircle,
-  TrendingUp,
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  Clock3,
   Download,
-  Share2
+  FileText,
+  MessageSquare,
+  Network,
+  RefreshCw,
+  ShieldCheck,
+  Users,
 } from 'lucide-react';
-import { PipelineWebChart } from './PipelineWebChart';
-import { RoadmapTimeline } from './RoadmapTimeline';
-import { CollaborativeNotesFeed } from './CollaborativeNotesFeed';
 import { SignalBar } from '@/components/trace/SignalBar';
 import { Toast } from '@/components/trace/Toast';
 
 export const ManagementWorkspace: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'topology' | 'roadmap' | 'feed' | 'metrics'>('topology');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'priority' | 'coordination' | 'metrics'>('priority');
+  const [queueFilter, setQueueFilter] = useState<'all' | 'critical' | 'sla' | 'unassigned'>('all');
+  const [showResolved, setShowResolved] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState('Just now');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [tasks, setTasks] = useState([
+    { id: 'TR-2026-089', title: 'Protection order and Zero FIR follow-up', risk: 'critical', owner: 'DySP K. Meena', agency: 'Police', due: '3 min left', dueMinutes: 3, status: 'Needs action', indicator: 'Intimidation + suicidal ideation' },
+    { id: 'TR-2026-074', title: 'Confirm legal aid appointment', risk: 'high', owner: 'Adv. T. Murthy', agency: 'DLSA', due: '42 min left', dueMinutes: 42, status: 'Awaiting agency', indicator: 'Social isolation' },
+    { id: 'TR-2026-052', title: 'Charge-sheet review before statutory deadline', risk: 'high', owner: 'DySP S. Rathore', agency: 'Investigation Cell', due: '18 hr left', dueMinutes: 1080, status: 'Needs action', indicator: 'Threats + displacement' },
+    { id: 'TR-2026-031', title: 'Court hearing and rehabilitation update', risk: 'moderate', owner: 'Registrar M. Khan', agency: 'Special Court', due: '2 days left', dueMinutes: 2880, status: 'Blocked', indicator: 'Prolonged proceedings' },
+    { id: 'TR-2026-018', title: 'Counselling follow-up scheduled', risk: 'low', owner: 'Priya Sharma', agency: 'NHAA Counselling', due: 'Completed today', dueMinutes: 9999, status: 'Resolved', indicator: 'General distress' },
+  ]);
 
   const notify = (msg: string) => {
     setToastMessage(msg);
   };
 
+  const visibleTasks = useMemo(() => tasks.filter((task) => {
+    if (!showResolved && task.status === 'Resolved') return false;
+    if (queueFilter === 'critical') return task.risk === 'critical';
+    if (queueFilter === 'sla') return task.dueMinutes <= 60;
+    if (queueFilter === 'unassigned') return !task.owner;
+    return true;
+  }), [queueFilter, showResolved, tasks]);
+
+  const updateTask = (id: string, status: string, message: string) => {
+    setTasks((current) => current.map((task) => task.id === id ? { ...task, status } : task));
+    notify(message);
+  };
+
+  const refresh = () => {
+    setLastUpdated('Just now');
+    notify('Operations view refreshed using local demo data.');
+  };
+
+  const exportQueue = () => {
+    const csv = ['Case,Title,Risk,Owner,Agency,Due,Status', ...visibleTasks.map((task) => [task.id, task.title, task.risk, task.owner, task.agency, task.due, task.status].map((value) => `"${value}"`).join(','))].join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'trace-operations-queue.csv';
+    anchor.click();
+    URL.revokeObjectURL(url);
+    notify(`Exported ${visibleTasks.length} visible cases.`);
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Topline Header */}
       <div className="auth-topline">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <h2 style={{ margin: 0 }}>Inter-Agency Operations Command</h2>
+            <h2 style={{ margin: 0 }}>Operations overview</h2>
             <span className="badge badge-low" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
               <ShieldCheck size={12} /> Statutory Section 15A Active
             </span>
           </div>
           <p style={{ margin: '4px 0 0', fontSize: 12.5, color: 'var(--a-muted)' }}>
-            Unified multi-agency coordination portal for Police, District Collectorate, Legal Aid (DLSA), and Judiciary.
+            Prioritise urgent victim support, track agency ownership, and resolve statutory deadlines.
           </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button 
-            className="btn btn-secondary"
-            onClick={() => notify('Exporting statutory compliance dossier (PDF/CSV)...')}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12 }}
-          >
-            <Download size={13} /> Export Report
+          <span className="demo-state">Frontend demo data · {lastUpdated}</span>
+          <button className="btn btn-secondary" onClick={refresh} title="Refresh operations view" aria-label="Refresh operations view">
+            <RefreshCw size={14} /> Refresh
           </button>
-          <span className="auth-role">District Executive Admin</span>
+          <button className="btn btn-secondary" onClick={exportQueue} title="Export visible queue" aria-label="Export visible queue">
+            <Download size={14} /> Export
+          </button>
         </div>
       </div>
 
-      {/* KPI Stat Cards Bar */}
       <div className="stat-cards">
-        <div className="stat-card">
-          <b>1,204</b>
-          <span>Total cases managed</span>
+        <div className="stat-card stat-card-critical">
+          <b>2</b>
+          <span>Critical cases requiring action</span>
+          <button type="button" onClick={() => setQueueFilter('critical')}>Open priority queue <ArrowRight size={13} /></button>
         </div>
         <div className="stat-card">
-          <b style={{ color: 'var(--a-critical)' }}>86</b>
-          <span>Critical tier active</span>
+          <b style={{ color: 'var(--a-high)' }}>3</b>
+          <span>Deadlines within one hour</span>
+          <button type="button" onClick={() => setQueueFilter('sla')}>Review SLA risk <ArrowRight size={13} /></button>
         </div>
         <div className="stat-card">
-          <b style={{ color: '#6FA287' }}>18 min</b>
-          <span>Avg. QRT first contact</span>
+          <b style={{ color: 'var(--a-accent)' }}>4</b>
+          <span>Agencies with open actions</span>
+          <button type="button" onClick={() => setActiveTab('coordination')}>View coordination <ArrowRight size={13} /></button>
         </div>
         <div className="stat-card">
-          <b style={{ color: 'var(--a-accent)' }}>97.4%</b>
-          <span>Statutory 48h SLA met</span>
+          <b style={{ color: 'var(--a-low)' }}>97.4%</b>
+          <span>Statutory SLA met this month</span>
+          <button type="button" onClick={() => setActiveTab('metrics')}>View metrics <ArrowRight size={13} /></button>
         </div>
       </div>
 
-      {/* Workspace Navigation Tabs */}
       <nav className="workspace-nav" aria-label="Management sections">
-        <button 
-          className={`workspace-tab ${activeTab === 'topology' ? 'active' : ''}`}
-          onClick={() => setActiveTab('topology')}
-        >
-          <Network size={15} />
-          Pipeline Web Chart
-          <span className="count">12 Nodes</span>
-        </button>
-
-        <button 
-          className={`workspace-tab ${activeTab === 'roadmap' ? 'active' : ''}`}
-          onClick={() => setActiveTab('roadmap')}
-        >
-          <Calendar size={15} />
-          Notion Roadmap & Timeline
-          <span className="count">6 Tracks</span>
-        </button>
-
-        <button 
-          className={`workspace-tab ${activeTab === 'feed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('feed')}
-        >
-          <MessageSquare size={15} />
-          Directives & Collaborative Notes
-          <span className="count">5 Orders</span>
-        </button>
-
-        <button 
-          className={`workspace-tab ${activeTab === 'metrics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('metrics')}
-        >
-          <BarChart3 size={15} />
-          Statutory SLAs & Executive Metrics
-        </button>
+        <button className={`workspace-tab ${activeTab === 'priority' ? 'active' : ''}`} onClick={() => setActiveTab('priority')}><AlertCircle size={15} /> Needs attention <span className="count">4 open</span></button>
+        <button className={`workspace-tab ${activeTab === 'coordination' ? 'active' : ''}`} onClick={() => setActiveTab('coordination')}><Users size={15} /> Agency coordination <span className="count">4 agencies</span></button>
+        <button className={`workspace-tab ${activeTab === 'metrics' ? 'active' : ''}`} onClick={() => setActiveTab('metrics')}><BarChart3 size={15} /> SLA and outcomes</button>
       </nav>
 
-      {/* Tab Panels */}
-      <div>
-        {activeTab === 'topology' && (
-          <PipelineWebChart onNotify={notify} />
-        )}
+      {activeTab === 'priority' && (
+        <div className="management-grid">
+          <section className="panel management-queue-panel">
+            <div className="section-heading">
+              <div><h3>Cases requiring attention</h3><p>Start with the most urgent safe action. All changes are local demo state.</p></div>
+              <span className="updated-label"><Clock3 size={13} /> Updated {lastUpdated}</span>
+            </div>
+            <div className="queue-toolbar">
+              <div className="chip-group" aria-label="Case queue filters">
+                {(['all', 'critical', 'sla', 'unassigned'] as const).map((filter) => <button key={filter} type="button" className={`chip ${queueFilter === filter ? 'on' : ''}`} onClick={() => setQueueFilter(filter)}>{filter === 'all' ? 'All open' : filter === 'critical' ? 'Critical' : filter === 'sla' ? 'SLA risk' : 'Unassigned'}</button>)}
+              </div>
+              <label className="checkbox-label"><input type="checkbox" checked={showResolved} onChange={(event) => setShowResolved(event.target.checked)} /> Include resolved</label>
+            </div>
+            <div className="task-list">
+              {visibleTasks.map((task) => <article key={task.id} className={`task-row task-${task.risk}`}>
+                <div className="task-priority" aria-label={`${task.risk} risk`}><span className={`node-status-dot ${task.risk === 'critical' ? 'critical' : task.risk === 'high' ? 'warning' : 'optimal'}`} /><span>{task.risk}</span></div>
+                <div className="task-main"><div className="task-title-line"><Link to="/staff/case/$id" params={{ id: task.id }}>{task.id}</Link><span className={`badge ${task.status === 'Resolved' ? 'low' : task.status === 'Blocked' ? 'critical' : task.risk}`}>{task.status}</span></div><strong>{task.title}</strong><span className="task-meta">{task.indicator} · {task.agency} · Owner: {task.owner}</span></div>
+                <div className={`task-deadline ${task.dueMinutes <= 60 ? 'urgent' : ''}`}><Clock3 size={14} /><span>{task.due}</span></div>
+                <div className="task-actions"><button type="button" className="btn btn-secondary btn-compact" onClick={() => navigate({ to: '/staff/case/$id', params: { id: task.id } })}>Open</button>{task.status !== 'Resolved' && <button type="button" className="btn btn-primary btn-compact" onClick={() => updateTask(task.id, 'Acknowledged', `${task.id} acknowledged by District Executive Admin.`)}>Acknowledge</button>}</div>
+              </article>)}
+              {visibleTasks.length === 0 && <div className="empty-state"><CheckCircle2 className="empty-icon" size={28} /><strong>No cases match this view</strong><span>Try another filter or include resolved cases.</span></div>}
+            </div>
+          </section>
+          <aside className="management-side-column">
+            <section className="panel action-panel"><div className="section-heading"><div><h3>Next actions</h3><p>Shortcuts for common management work.</p></div></div><button type="button" className="action-link" onClick={() => updateTask('TR-2026-089', 'Dispatched', 'Protection coordination marked as dispatched.') }><ShieldCheck size={16} /><span><strong>Confirm protection dispatch</strong><small>TR-2026-089 · Police QRT</small></span><ArrowRight size={15} /></button><button type="button" className="action-link" onClick={() => setActiveTab('coordination')}><MessageSquare size={16} /><span><strong>Review agency acknowledgements</strong><small>3 directives need review</small></span><ArrowRight size={15} /></button><button type="button" className="action-link" onClick={exportQueue}><FileText size={16} /><span><strong>Export current queue</strong><small>CSV for operational review</small></span><ArrowRight size={15} /></button></section>
+            <section className="panel status-panel"><div className="section-heading"><div><h3>Service status</h3><p>Frontend simulation status</p></div><span className="status-live"><span /> Ready</span></div><div className="service-row"><span><Network size={14} /> Intake and assessment</span><b>Operational</b></div><div className="service-row"><span><ShieldCheck size={14} /> Dispatch workflow</span><b>Needs backend</b></div><div className="service-row"><span><Users size={14} /> Agency coordination</span><b>Operational</b></div></section>
+          </aside>
+        </div>
+      )}
 
-        {activeTab === 'roadmap' && (
-          <RoadmapTimeline onNotify={notify} />
-        )}
+      {activeTab === 'coordination' && (
+        <div className="management-grid">
+          <section className="panel"><div className="section-heading"><div><h3>Agency coordination</h3><p>Track open work by the team that must act next.</p></div><button type="button" className="btn btn-secondary btn-compact" onClick={() => notify('Coordination list refreshed.') }><RefreshCw size={13} /> Refresh</button></div><div className="agency-list">{[['Police and QRT', '2 critical protections', 'critical'], ['DLSA Legal Aid', '1 appointment awaiting confirmation', 'high'], ['District Collectorate', '1 compensation review', 'high'], ['NHAA Counselling', '4 follow-ups scheduled', 'low']].map(([name, detail, risk]) => <div className="agency-row" key={name}><div className="agency-avatar"><Users size={16} /></div><div><strong>{name}</strong><span>{detail}</span></div><span className={`badge ${risk}`}>{risk === 'critical' ? 'Immediate' : risk === 'high' ? 'Urgent' : 'Routine'}</span><button type="button" className="btn btn-secondary btn-compact" onClick={() => notify(`${name} workspace opened in frontend demo.`)}>Review</button></div>)}</div></section>
+          <section className="panel"><div className="section-heading"><div><h3>Coordination principles</h3><p>Use these checks before closing an action.</p></div></div><ul className="principles-list"><li><CheckCircle2 size={15} /> Confirm the responsible agency and named owner.</li><li><CheckCircle2 size={15} /> Record the next deadline and escalation path.</li><li><CheckCircle2 size={15} /> Keep victim identity and transcript access restricted.</li><li><CheckCircle2 size={15} /> Do not mark a notification complete without acknowledgement.</li></ul><button type="button" className="btn btn-primary" onClick={() => notify('Coordination note composer opened in frontend demo.')}> <MessageSquare size={14} /> Add coordination note</button></section>
+        </div>
+      )}
 
-        {activeTab === 'feed' && (
-          <CollaborativeNotesFeed onNotify={notify} />
-        )}
-
-        {activeTab === 'metrics' && (
+      {activeTab === 'metrics' && (
+        <div className="management-grid metrics-view">
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
             {/* Risk Tier Panel */}
             <div className="panel">
@@ -209,12 +241,11 @@ export const ManagementWorkspace: React.FC = () => {
               </div>
             </div>
           </div>
-        )}
-      </div>
-
-      {toastMessage && (
-        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
+          <section className="panel"><div className="section-heading"><div><h3>Outcome summary</h3><p>Local demo snapshot for product review.</p></div></div><div className="outcome-list"><div><b>68%</b><span>Critical cases contacted within 15 minutes</span></div><div><b>84%</b><span>High-risk cases with owner assigned</span></div><div><b>92%</b><span>Cases with a recorded next action</span></div></div></section>
+        </div>
       )}
+
+      {toastMessage && <Toast message={toastMessage} onDone={() => setToastMessage(null)} />}
     </div>
   );
 };

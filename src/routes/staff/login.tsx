@@ -6,8 +6,8 @@ export const Route = createFileRoute('/staff/login')({
 });
 
 function StaffLoginPage() {
-  const [email, setEmail] = useState('counsellor@nhaa.gov.in');
-  const [password, setPassword] = useState('demoPassword123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
@@ -54,6 +54,7 @@ function StaffLoginPage() {
         <p style={{ fontSize: 12.5, color: 'var(--a-muted)', margin: '0 0 18px' }}>
           Sign in with your authorised account (Prototype mode pre-filled)
         </p>
+        <p style={{ fontSize: 11.5, color: 'var(--a-muted)', margin: '0 0 12px', padding: '8px 12px', background: 'rgba(91,141,239,0.08)', borderRadius: 6, border: '1px solid rgba(91,141,239,0.2)' }}>Demo: counsellor@nhaa.gov.in / demoPassword123</p>
 
         <div style={{ marginBottom: 14 }}>
           <label className="field-label" htmlFor="loginEmail">

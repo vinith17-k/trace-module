@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 import { ConfirmModal } from '@/components/trace/ConfirmModal';
@@ -72,6 +73,7 @@ const INITIAL_POLICE_CASES: PoliceCase[] = [
 ];
 
 function LawEnforcementPage() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [cases, setCases] = useState<PoliceCase[]>(INITIAL_POLICE_CASES);
   const [filter, setFilter] = useState<string>('all');

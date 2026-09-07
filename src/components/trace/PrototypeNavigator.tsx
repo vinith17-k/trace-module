@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useRouterState } from '@tanstack/react-router';
 
 export function PrototypeNavigator() {
+  if (!import.meta.env.DEV) return null;
+
   const [isOpen, setIsOpen] = useState(false);
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;

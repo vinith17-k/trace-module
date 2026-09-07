@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 
@@ -13,6 +14,7 @@ const MY_CASES = [
 ];
 
 function MyCasesPage() {
+  useAuthGuard();
   const navigate = useNavigate();
 
   return (

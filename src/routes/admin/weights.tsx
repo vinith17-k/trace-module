@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { Toast } from '@/components/trace/Toast';
 
@@ -24,6 +25,7 @@ const INITIAL_WEIGHTS: WeightRow[] = [
 ];
 
 function SviWeightsPage() {
+  useAuthGuard();
   const [weights, setWeights] = useState<WeightRow[]>(INITIAL_WEIGHTS);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 

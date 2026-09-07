@@ -11,11 +11,24 @@ interface Props {
 export function StaffLayout({
   children,
   mode = 'staff',
-  userRole,
-  userName,
+  userRole: propUserRole,
+  userName: propUserName,
 }: Props) {
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+
+  let userName = propUserName;
+  let userRole = propUserRole;
+  try {
+    const rawUser = typeof window !== 'undefined' ? sessionStorage.getItem('trace_staff_user') : null;
+    if (rawUser) {
+      const parsed = JSON.parse(rawUser);
+      if (!userName && parsed.name) userName = parsed.name;
+      if (!userRole && parsed.role) userRole = parsed.role;
+    }
+  } catch {
+    // ignore
+  }
 
   const staffNav = [
     {
@@ -173,25 +186,79 @@ export function StaffLayout({
 
   return (
     <div className="auth">
-      <aside className="auth-sidebar">
+      <aside className="auth-sidebar" style={{ display: 'flex', flexDirection: 'column' }}>
         <Link to="/" className="auth-logo" style={{ textDecoration: 'none' }}>
           TRACE
         </Link>
         <nav className="auth-nav">
-          {items.map((item) => {
+          {items.map((item, index) => {
             const isActive = currentPath === item.to || (item.to !== '/admin' && item.to !== '/staff/queue' && currentPath.startsWith(item.to));
+            const groupLabel = mode === 'admin'
+              ? index === 0
+                ? 'Operations'
+                : index === 1
+                  ? 'Configuration'
+                  : index === 5
+                    ? 'Governance'
+                    : index === 7
+                      ? 'Switch context'
+                      : null
+              : null;
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={isActive ? 'on' : ''}
-              >
-                {item.icon}
-                {item.label}
-              </Link>
+              <React.Fragment key={item.to}>
+                {groupLabel && <div className="auth-nav-section-label">{groupLabel}</div>}
+                <Link to={item.to} className={isActive ? 'on' : ''}>
+                  {item.icon}
+                  {item.label}
+                </Link>
+              </React.Fragment>
             );
           })}
         </nav>
+
+        {/* Logged-in user footer */}
+        <div style={{
+          marginTop: 'auto',
+          paddingTop: 16,
+          borderTop: '1px solid var(--a-border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'var(--a-accent)', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 800, fontSize: 13, flexShrink: 0
+            }}>
+              {(userName ?? 'P').charAt(0).toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 12.5, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {userName ?? 'Priya S.'}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--a-muted)' }}>{userRole ?? (mode === 'admin' ? 'Admin' : 'Counsellor')}</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            title="Sign out"
+            onClick={() => {
+              try { sessionStorage.clear(); } catch { /* ignore */ }
+              window.location.href = '/staff/login';
+            }}
+            style={{
+              background: 'none', border: '1px solid var(--a-border)', borderRadius: 8,
+              color: 'var(--a-muted)', cursor: 'pointer', padding: '5px 7px',
+              fontSize: 11, display: 'flex', alignItems: 'center', gap: 4,
+              flexShrink: 0
+            }}
+          >
+            ⏻ Out
+          </button>
+        </div>
       </aside>
 
       <div className="auth-main">

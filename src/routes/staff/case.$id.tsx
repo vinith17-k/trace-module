@@ -1,5 +1,6 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useState, useEffect } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 import { SviRing } from '@/components/trace/SviRing';
@@ -12,6 +13,7 @@ export const Route = createFileRoute('/staff/case/$id')({
 });
 
 function CaseDetailPage() {
+  useAuthGuard();
   const params = useParams({ from: '/staff/case/$id' });
   const caseId = params.id || 'NHAA-4F82-K91';
 
@@ -251,9 +253,11 @@ function CaseDetailPage() {
                   <div
                     style={{
                       position: 'absolute',
-                      left: `calc(${audioProgress}% - 6px)`,
-                      width: 12,
-                      height: 12,
+                      left: `calc(${audioProgress}% - 10px)`,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: 20,
+                      height: 20,
                       borderRadius: '50%',
                       background: '#fff',
                       boxShadow: '0 0 8px rgba(0,0,0,0.5)',

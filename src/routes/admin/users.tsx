@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { Toast } from '@/components/trace/Toast';
 
@@ -72,6 +73,7 @@ const INITIAL_USERS: UserAccount[] = [
 ];
 
 function UsersManagementPage() {
+  useAuthGuard();
   const [users, setUsers] = useState<UserAccount[]>(INITIAL_USERS);
   const [roleFilter, setRoleFilter] = useState('All');
   const [search, setSearch] = useState('');
@@ -171,6 +173,7 @@ function UsersManagementPage() {
                 <th>District</th>
                 <th>Status</th>
                 <th>Last Active</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -210,12 +213,69 @@ function UsersManagementPage() {
                     </span>
                   </td>
                   <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{u.lastActive}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap' }}>
+                      {u.status === 'Pending invite' ? (
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6 }}
+                          onClick={() => {
+                            setToastMessage(`Invite resent to ${u.email}.`);
+                          }}
+                        >
+                          Resend
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn-ghost"
+                          style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6 }}
+                          onClick={() => {
+                            setUsers((prev) =>
+                              prev.map((x) =>
+                                x.id === u.id
+                                  ? { ...x, status: x.status === 'Active' ? 'Pending invite' : 'Active' }
+                                  : x
+                              )
+                            );
+                            setToastMessage(
+                              u.status === 'Active'
+                                ? `${u.name} access suspended.`
+                                : `${u.name} reinstated.`
+                            );
+                          }}
+                        >
+                          {u.status === 'Active' ? 'Suspend' : 'Reinstate'}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: '3px 9px',
+                          borderRadius: 6,
+                          background: 'none',
+                          border: '1px solid rgba(224,88,79,0.4)',
+                          color: 'var(--a-critical)',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => {
+                          setUsers((prev) => prev.filter((x) => x.id !== u.id));
+                          setToastMessage(`${u.name} access revoked and removed.`);
+                        }}
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
 
       {modalOpen && (
         <div className="confirm-modal-backdrop open" onClick={() => setModalOpen(false)}>

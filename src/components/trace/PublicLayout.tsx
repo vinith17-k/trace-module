@@ -135,7 +135,7 @@ export function PublicLayout({ children }: Props) {
                   }}
                   onClick={() => setPortalOpen(false)}
                 >
-                  <span>👮</span> Police &amp; Escorts
+                  <span>👮</span> Police & Escorts
                 </Link>
                 <div style={{ height: 1, background: '#E8E1D2', margin: '4px 6px' }} />
                 <Link
@@ -186,11 +186,11 @@ export function PublicLayout({ children }: Props) {
           <Link to="/contact" onClick={() => setMobileOpen(false)}>Contact</Link>
           <div style={{ height: 1, background: '#E8E1D2', margin: '4px 0' }} />
           <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--pub-ink)', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Staff &amp; Authority Portals
+            Staff & Authority Portals
           </div>
           <Link to="/staff/login" onClick={() => setMobileOpen(false)}>🔐 Staff Login</Link>
           <Link to="/staff/queue" onClick={() => setMobileOpen(false)}>🩺 Counsellor Queue</Link>
-          <Link to="/staff/police" onClick={() => setMobileOpen(false)}>👮 Police &amp; Escorts</Link>
+          <Link to="/staff/police" onClick={() => setMobileOpen(false)}>👮 Police & Escorts</Link>
           <Link to="/admin" onClick={() => setMobileOpen(false)}>⚙️ Administration</Link>
           <Link
             to="/support"

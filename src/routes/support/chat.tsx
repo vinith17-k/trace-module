@@ -139,6 +139,8 @@ export function ChatIntakePage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading, isTyping]);
 
+  const userMessageCount = messages.filter((m) => m.sender === 'user').length;
+
   return (
     <VictimLayout>
       <div className="v-stage">

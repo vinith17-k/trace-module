@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { Toast } from '@/components/trace/Toast';
 
@@ -92,6 +93,7 @@ const INITIAL_AUDIT_LOG: AuditLogEntry[] = [
 ];
 
 function AuditLogViewerPage() {
+  useAuthGuard();
   const [logs] = useState<AuditLogEntry[]>(INITIAL_AUDIT_LOG);
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [search, setSearch] = useState('');

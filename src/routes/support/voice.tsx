@@ -16,6 +16,13 @@ export function VoiceIntakePage() {
   );
   const [loading, setLoading] = useState(false);
 
+  // Mark active channel so emergency page can return here
+  useEffect(() => {
+    sessionStorage.setItem('trace_channel', 'voice');
+    return () => { /* keep the channel marker until session ends */ };
+  }, []);
+
+
   useEffect(() => {
     let timer: any;
     if (recording) {
@@ -145,6 +152,8 @@ export function VoiceIntakePage() {
                   borderRadius: 12,
                   padding: '12px 14px',
                   color: '#3A342A',
+                  background: 'var(--v-card)',
+                  resize: 'vertical',
                 }}
               />
               <div style={{ display: 'flex', gap: 12, marginTop: 14 }}>

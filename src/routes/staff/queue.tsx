@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState, useMemo } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 
@@ -67,10 +68,16 @@ const INITIAL_CASES: CaseItem[] = [
 ];
 
 function CaseQueuePage() {
+  useAuthGuard();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<'all' | 'critical' | 'high' | 'moderate' | 'low'>('all');
   const [sortBy, setSortBy] = useState<'risk' | 'sla' | 'time'>('risk');
   const [search, setSearch] = useState('');
+
+  const sinceToMinutes = (since: string): number => {
+    if (since.includes('hr')) return parseInt(since) * 60;
+    return parseInt(since);
+  };
 
   const filteredCases = useMemo(() => {
     const list = INITIAL_CASES.filter((c) => {
@@ -85,6 +92,7 @@ function CaseQueuePage() {
     return list.sort((a, b) => {
       if (sortBy === 'risk') return b.score - a.score;
       if (sortBy === 'sla') return a.slaMinutesLeft - b.slaMinutesLeft;
+      if (sortBy === 'time') return sinceToMinutes(a.since) - sinceToMinutes(b.since);
       return 0;
     });
   }, [filter, sortBy, search]);
@@ -224,8 +232,16 @@ function CaseQueuePage() {
             ))}
             {filteredCases.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: '30px', color: 'var(--a-muted)' }}>
-                  No cases match the selected filter.
+                <td colSpan={8}>
+                  <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                    <div style={{ fontSize: 32, marginBottom: 10, opacity: 0.3 }}>◎</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--a-text)', marginBottom: 4 }}>
+                      No cases match
+                    </div>
+                    <div style={{ fontSize: 12.5, color: 'var(--a-muted)' }}>
+                      Try a different filter or clear your search.
+                    </div>
+                  </div>
                 </td>
               </tr>
             )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 
 interface Props {
   open: boolean;
@@ -24,6 +24,16 @@ export function ConfirmModal({
   onCancel,
 }: Props) {
   const [note, setNote] = useState('');
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCancel();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onCancel, open]);
 
   if (!open) return null;
 
@@ -33,9 +43,10 @@ export function ConfirmModal({
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
+      aria-labelledby={titleId}
     >
       <div className="confirm-modal" onClick={(e) => e.stopPropagation()}>
-        <h3>{title}</h3>
+        <h3 id={titleId}>{title}</h3>
         <p>{body}</p>
         {showNote && (
           <textarea

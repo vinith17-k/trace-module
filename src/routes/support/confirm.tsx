@@ -206,7 +206,7 @@ function PostIntakeConfirmationPage() {
               style={{ background: 'var(--v-sys-bubble)', color: '#26362A' }}
               onClick={() => navigate({ to: '/' })}
             >
-              Done &amp; Return Home
+              Done & Return Home
             </button>
 
             <Link

@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { StaffLayout } from '@/components/trace/StaffLayout';
 import { BadgeRisk } from '@/components/trace/BadgeRisk';
 import { Toast } from '@/components/trace/Toast';
@@ -24,6 +25,7 @@ const INITIAL_THRESHOLDS: ThresholdTier[] = [
 ];
 
 function RiskThresholdsPage() {
+  useAuthGuard();
   const [thresholds, setThresholds] = useState<ThresholdTier[]>(INITIAL_THRESHOLDS);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 

@@ -8,6 +8,22 @@ export const Route = createFileRoute('/support/emergency')({
 function EmergencyOverlayPage() {
   const navigate = useNavigate();
 
+  // Determine which intake channel to return to
+  const returnChannel = (() => {
+    try {
+      const result = sessionStorage.getItem('trace_result');
+      if (result) {
+        const parsed = JSON.parse(result);
+        if (parsed.channel === 'voice') return '/support/voice';
+      }
+      // Check if voice page was in progress
+      const voiceActive = sessionStorage.getItem('trace_channel');
+      if (voiceActive === 'voice') return '/support/voice';
+    } catch { /* ignore */ }
+    return '/support/chat';
+  })();
+
+
   return (
     <VictimLayout showLangBar={false}>
       <div className="v-stage" style={{ position: 'relative', minHeight: 480 }}>
@@ -86,9 +102,9 @@ function EmergencyOverlayPage() {
                 color: '#5A5343',
                 marginTop: 10,
               }}
-              onClick={() => navigate({ to: '/support/chat' })}
+              onClick={() => navigate({ to: returnChannel as any })}
             >
-              Keep chatting instead
+              {returnChannel === '/support/voice' ? 'Back to voice recording' : 'Keep chatting instead'}
             </button>
           </div>
         </div>

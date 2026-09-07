@@ -566,7 +566,7 @@ export const PipelineWebChart: React.FC<PipelineWebChartProps> = ({ onNotify }) 
                           <div style={{ margin: '8px 0 6px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: 'var(--a-muted)', marginBottom: 3 }}>
                               <span>Load: {node.activeLoad}/{node.capacity}</span>
-                              <span style={{ color: loadPct > 80 ? 'var(--a-critical)' : 'inherit' }}>{loadPct}%</span>
+                              <span style={{ color: loadPct > 80 ? 'var(--a-critical)' : 'inherit' }}>{Math.min(loadPct, 100)}%</span>
                             </div>
                             <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' }}>
                               <div 

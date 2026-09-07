@@ -6,7 +6,7 @@ interface Props {
   duration?: number;
 }
 
-export function Toast({ message, onDone, duration = 3000 }: Props) {
+export function Toast({ message, onDone, duration = 5000 }: Props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -18,5 +18,38 @@ export function Toast({ message, onDone, duration = 3000 }: Props) {
     return () => clearTimeout(t);
   }, [onDone, duration]);
 
-  return <div className={`toast ${visible ? 'show' : ''}`}>{message}</div>;
+  const handleClose = () => {
+    setVisible(false);
+    setTimeout(onDone, 300);
+  };
+
+  return (
+    <div
+      className={`toast ${visible ? 'show' : ''}`}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between' }}
+    >
+      <span>{message}</span>
+      <button
+        type="button"
+        onClick={handleClose}
+        aria-label="Dismiss notification"
+        style={{
+          background: 'none',
+          border: 'none',
+          color: 'inherit',
+          cursor: 'pointer',
+          padding: '0 2px',
+          fontSize: 16,
+          lineHeight: 1,
+          opacity: 0.7,
+          flexShrink: 0,
+        }}
+      >
+        ×
+      </button>
+    </div>
+  );
 }

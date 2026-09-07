@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { StaffLayout } from '@/components/trace/StaffLayout';
-import { Toast } from '@/components/trace/Toast';
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { StaffLayout } from "@/components/trace/StaffLayout";
+import { Toast } from "@/components/trace/Toast";
 
-export const Route = createFileRoute('/admin/lexicon')({
+export const Route = createFileRoute("/admin/lexicon")({
   component: RiskLexiconPage,
 });
 
@@ -14,60 +14,169 @@ interface LexiconTerm {
   language: string;
   weight: number;
   phraseSample: string;
-  status: 'Active' | 'Under Review';
+  status: "Active" | "Under Review";
 }
 
 const INITIAL_LEXICON: LexiconTerm[] = [
   // English
-  { id: '1', category: 'Self-harm & suicide ideation', language: 'English', weight: 0.95, phraseSample: 'want to end my life / no reason to live', status: 'Active' },
-  { id: '2', category: 'Physical intimidation & threats', language: 'English', weight: 0.85, phraseSample: 'they will come back / kill us all', status: 'Active' },
-  { id: '3', category: 'Social boycott & water denial', language: 'English', weight: 0.80, phraseSample: 'stopped us from drawing well water', status: 'Active' },
+  {
+    id: "1",
+    category: "Self-harm & suicide ideation",
+    language: "English",
+    weight: 0.95,
+    phraseSample: "want to end my life / no reason to live",
+    status: "Active",
+  },
+  {
+    id: "2",
+    category: "Physical intimidation & threats",
+    language: "English",
+    weight: 0.85,
+    phraseSample: "they will come back / kill us all",
+    status: "Active",
+  },
+  {
+    id: "3",
+    category: "Social boycott & water denial",
+    language: "English",
+    weight: 0.8,
+    phraseSample: "stopped us from drawing well water",
+    status: "Active",
+  },
 
   // Hindi
-  { id: '4', category: 'Death threats & intimidation', language: 'Hindi', weight: 0.90, phraseSample: 'जान से मार देंगे (threat to kill)', status: 'Active' },
-  { id: '5', category: 'Casteist slur & public humiliation', language: 'Hindi', weight: 0.85, phraseSample: 'जातिसूचक गालियां / अपमान (caste slur)', status: 'Active' },
-  { id: '6', category: 'Village exclusion & boycott', language: 'Hindi', weight: 0.80, phraseSample: 'गांव से निकाल दिया (expelled from village)', status: 'Active' },
+  {
+    id: "4",
+    category: "Death threats & intimidation",
+    language: "Hindi",
+    weight: 0.9,
+    phraseSample: "जान से मार देंगे (threat to kill)",
+    status: "Active",
+  },
+  {
+    id: "5",
+    category: "Casteist slur & public humiliation",
+    language: "Hindi",
+    weight: 0.85,
+    phraseSample: "जातिसूचक गालियां / अपमान (caste slur)",
+    status: "Active",
+  },
+  {
+    id: "6",
+    category: "Village exclusion & boycott",
+    language: "Hindi",
+    weight: 0.8,
+    phraseSample: "गांव से निकाल दिया (expelled from village)",
+    status: "Active",
+  },
 
   // Marathi
-  { id: '7', category: 'Severe physical assault', language: 'Marathi', weight: 0.90, phraseSample: 'जीवे मारण्याची धमकी (death threat)', status: 'Active' },
-  { id: '8', category: 'Social boycott & outcast', language: 'Marathi', weight: 0.85, phraseSample: 'गावातून वाळीत टाकले (socially boycotted)', status: 'Active' },
+  {
+    id: "7",
+    category: "Severe physical assault",
+    language: "Marathi",
+    weight: 0.9,
+    phraseSample: "जीवे मारण्याची धमकी (death threat)",
+    status: "Active",
+  },
+  {
+    id: "8",
+    category: "Social boycott & outcast",
+    language: "Marathi",
+    weight: 0.85,
+    phraseSample: "गावातून वाळीत टाकले (socially boycotted)",
+    status: "Active",
+  },
 
   // Tamil
-  { id: '9', category: 'Violence & weapon intimidation', language: 'Tamil', weight: 0.90, phraseSample: 'கொலை மிரட்டல் (murder threat)', status: 'Active' },
-  { id: '10', category: 'Temple / pathway denial', language: 'Tamil', weight: 0.80, phraseSample: 'ஊரை விட்டு ஒதுக்கி வைத்தனர் (ostracized)', status: 'Active' },
+  {
+    id: "9",
+    category: "Violence & weapon intimidation",
+    language: "Tamil",
+    weight: 0.9,
+    phraseSample: "கொலை மிரட்டல் (murder threat)",
+    status: "Active",
+  },
+  {
+    id: "10",
+    category: "Temple / pathway denial",
+    language: "Tamil",
+    weight: 0.8,
+    phraseSample: "ஊரை விட்டு ஒதுக்கி வைத்தனர் (ostracized)",
+    status: "Active",
+  },
 
   // Telugu
-  { id: '11', category: 'Intimidation & village eviction', language: 'Telugu', weight: 0.85, phraseSample: 'చంపేస్తామని బెదిరింపు (death threat)', status: 'Active' },
+  {
+    id: "11",
+    category: "Intimidation & village eviction",
+    language: "Telugu",
+    weight: 0.85,
+    phraseSample: "చంపేస్తామని బెదిరింపు (death threat)",
+    status: "Active",
+  },
 
   // Bengali
-  { id: '12', category: 'Severe coercion & assault', language: 'Bengali', weight: 0.85, phraseSample: 'খুন করার হুমকি (threat to murder)', status: 'Active' },
+  {
+    id: "12",
+    category: "Severe coercion & assault",
+    language: "Bengali",
+    weight: 0.85,
+    phraseSample: "খুন করার হুমকি (threat to murder)",
+    status: "Active",
+  },
 
   // Gujarati
-  { id: '13', category: 'Land dispossession & threats', language: 'Gujarati', weight: 0.85, phraseSample: 'જાનથી મારી નાખવાની ધમકી (death threat)', status: 'Active' },
+  {
+    id: "13",
+    category: "Land dispossession & threats",
+    language: "Gujarati",
+    weight: 0.85,
+    phraseSample: "જાનથી મારી નાખવાની ધમકી (death threat)",
+    status: "Active",
+  },
 
   // Kannada
-  { id: '14', category: 'Social boycott & denial of dignity', language: 'Kannada', weight: 0.85, phraseSample: 'ಕೊಲ್ಲುವ ಬೆದರಿಕೆ (threat to kill)', status: 'Active' },
+  {
+    id: "14",
+    category: "Social boycott & denial of dignity",
+    language: "Kannada",
+    weight: 0.85,
+    phraseSample: "ಕೊಲ್ಲುವ ಬೆದರಿಕೆ (threat to kill)",
+    status: "Active",
+  },
 ];
 
-const SUPPORTED_LANGUAGES = ['All', 'English', 'Hindi', 'Marathi', 'Tamil', 'Telugu', 'Bengali', 'Gujarati', 'Kannada'];
+const SUPPORTED_LANGUAGES = [
+  "All",
+  "English",
+  "Hindi",
+  "Marathi",
+  "Tamil",
+  "Telugu",
+  "Bengali",
+  "Gujarati",
+  "Kannada",
+];
 
 function RiskLexiconPage() {
   useAuthGuard();
   const [lexicon, setLexicon] = useState<LexiconTerm[]>(INITIAL_LEXICON);
-  const [selectedLang, setSelectedLang] = useState('All');
-  const [search, setSearch] = useState('');
+  const [selectedLang, setSelectedLang] = useState("All");
+  const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // New term form
-  const [newCat, setNewCat] = useState('Violence reference');
-  const [newLang, setNewLang] = useState('Hindi');
+  const [newCat, setNewCat] = useState("Violence reference");
+  const [newLang, setNewLang] = useState("Hindi");
   const [newWeight, setNewWeight] = useState(0.85);
-  const [newPhrase, setNewPhrase] = useState('');
+  const [newPhrase, setNewPhrase] = useState("");
 
   const filtered = useMemo(() => {
     return lexicon.filter((item) => {
-      const matchLang = selectedLang === 'All' || item.language.toLowerCase() === selectedLang.toLowerCase();
+      const matchLang =
+        selectedLang === "All" || item.language.toLowerCase() === selectedLang.toLowerCase();
       const matchSearch =
         !search.trim() ||
         item.category.toLowerCase().includes(search.toLowerCase()) ||
@@ -86,12 +195,12 @@ function RiskLexiconPage() {
       language: newLang,
       weight: newWeight,
       phraseSample: newPhrase,
-      status: 'Active',
+      status: "Active",
     };
 
     setLexicon([term, ...lexicon]);
     setModalOpen(false);
-    setNewPhrase('');
+    setNewPhrase("");
     setToastMessage(`New phrase added to the ${newLang} lexicon.`);
   };
 
@@ -100,27 +209,24 @@ function RiskLexiconPage() {
       <div className="auth-topline">
         <div>
           <h2>Risk Lexicon Management</h2>
-          <p style={{ fontSize: 12.5, color: 'var(--a-muted)', margin: '4px 0 0' }}>
-            Multilingual keyword dictionary spanning 8 official Indian languages for instant trauma cue matching
+          <p style={{ fontSize: 12.5, color: "var(--a-muted)", margin: "4px 0 0" }}>
+            Multilingual keyword dictionary spanning 8 official Indian languages for instant trauma
+            cue matching
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-dash"
-          onClick={() => setModalOpen(true)}
-        >
+        <button type="button" className="btn-dash" onClick={() => setModalOpen(true)}>
           + Add Lexicon Term
         </button>
       </div>
 
       {/* Language Filter Chips */}
       <div className="filter-row">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {SUPPORTED_LANGUAGES.map((lang) => (
             <button
               key={lang}
               type="button"
-              className={`chip ${selectedLang === lang ? 'on' : ''}`}
+              className={`chip ${selectedLang === lang ? "on" : ""}`}
               onClick={() => setSelectedLang(lang)}
             >
               {lang}
@@ -158,15 +264,18 @@ function RiskLexiconPage() {
                     <span className="tag">{item.language}</span>
                   </td>
                   <td>{item.weight.toFixed(2)}</td>
-                  <td style={{ fontSize: 13, color: 'var(--a-text)', fontFamily: 'monospace' }}>
+                  <td style={{ fontSize: 13, color: "var(--a-text)", fontFamily: "monospace" }}>
                     {item.phraseSample}
                   </td>
                   <td>
                     <span
                       className="tag"
                       style={{
-                        color: item.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
-                        borderColor: item.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
+                        color: item.status === "Active" ? "var(--a-low)" : "var(--a-high)",
+                        borderColor:
+                          item.status === "Active"
+                            ? "rgba(111,162,135,0.4)"
+                            : "rgba(224,162,61,0.4)",
                       }}
                     >
                       {item.status}
@@ -181,9 +290,13 @@ function RiskLexiconPage() {
 
       {modalOpen && (
         <div className="confirm-modal-backdrop open" onClick={() => setModalOpen(false)}>
-          <div className="confirm-modal" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
+          <div
+            className="confirm-modal"
+            style={{ maxWidth: 440 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Add New Lexicon Term</h3>
-            <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '0 0 14px' }}>
+            <p style={{ fontSize: 13, color: "var(--a-muted)", margin: "0 0 14px" }}>
               Add a new threat, violence, or caste-atrocity cue phrase to the detection dictionary
             </p>
 
@@ -195,7 +308,7 @@ function RiskLexiconPage() {
                   value={newLang}
                   onChange={(e) => setNewLang(e.target.value)}
                 >
-                  {SUPPORTED_LANGUAGES.filter((l) => l !== 'All').map((l) => (
+                  {SUPPORTED_LANGUAGES.filter((l) => l !== "All").map((l) => (
                     <option key={l} value={l}>
                       {l}
                     </option>
@@ -251,9 +364,7 @@ function RiskLexiconPage() {
         </div>
       )}
 
-      {toastMessage && (
-        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
-      )}
+      {toastMessage && <Toast message={toastMessage} onDone={() => setToastMessage(null)} />}
     </StaffLayout>
   );
 }

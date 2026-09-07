@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { PublicLayout } from '@/components/trace/PublicLayout';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { PublicLayout } from "@/components/trace/PublicLayout";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: PublicHome,
 });
 
@@ -12,13 +12,14 @@ function PublicHome() {
         <div>
           <h1>Someone is ready to listen, right now.</h1>
           <p>
-            TRACE connects you to counselling, legal aid, and protection through NHAA (14566) — in your language, at your pace, and only with your consent.
+            TRACE connects you to counselling, legal aid, and protection through NHAA (14566) — in
+            your language, at your pace, and only with your consent.
           </p>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <Link
               to="/support"
               className="btn"
-              style={{ background: 'var(--pub-terracotta)', color: '#fff' }}
+              style={{ background: "var(--pub-terracotta)", color: "#fff" }}
             >
               Get support now
             </Link>
@@ -26,9 +27,9 @@ function PublicHome() {
               to="/about"
               className="btn"
               style={{
-                background: 'transparent',
-                border: '1.5px solid #cfc6b0',
-                color: 'var(--pub-ink)',
+                background: "transparent",
+                border: "1.5px solid #cfc6b0",
+                color: "var(--pub-ink)",
               }}
             >
               How it works

@@ -14,16 +14,7 @@ export const MODEL_VERSION = "trace-svi-v1";
 export const LLM_MODEL_NAME = "google/gemini-3.7-flash";
 
 /** Data-driven language support: codes are only used as data, never branched on. */
-export const SUPPORTED_LANGUAGES = [
-  "en",
-  "hi",
-  "mr",
-  "ta",
-  "te",
-  "bn",
-  "gu",
-  "kn",
-] as const;
+export const SUPPORTED_LANGUAGES = ["en", "hi", "mr", "ta", "te", "bn", "gu", "kn"] as const;
 
 export const EMOTION_KEYS = [
   "distress",
@@ -35,9 +26,7 @@ export const EMOTION_KEYS = [
 ] as const;
 export type EmotionKey = (typeof EMOTION_KEYS)[number];
 
-type Admin = Awaited<
-  typeof import("@/integrations/supabase/client.server")
->["supabaseAdmin"];
+type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 
 async function admin(): Promise<Admin> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -343,10 +332,7 @@ export interface SviResult {
 /** Threshold above which an emotional cue is reported as a trauma indicator. */
 const INDICATOR_THRESHOLD = 0.4;
 
-export async function computeSvi(
-  interactionId: string,
-  isPartial = false,
-): Promise<SviResult> {
+export async function computeSvi(interactionId: string, isPartial = false): Promise<SviResult> {
   const db = await admin();
 
   const [{ data: signals }, { data: weights }, { data: thresholds }] = await Promise.all([
@@ -355,7 +341,10 @@ export async function computeSvi(
       .select("signal_type, value, numeric_value, confidence, model_version")
       .eq("interaction_id", interactionId)
       .is("deleted_at", null),
-    db.from("svi_weights").select("signal_type, signal_key, weight, max_contribution, config_version").eq("active", true),
+    db
+      .from("svi_weights")
+      .select("signal_type, signal_key, weight, max_contribution, config_version")
+      .eq("active", true),
     db.from("risk_thresholds").select("risk_category, min_score, max_score, config_version"),
   ]);
 
@@ -405,7 +394,12 @@ export async function computeSvi(
     contribution: Math.round(b.sum * 100) / 100,
   }));
   const sviScore =
-    Math.round(Math.min(100, breakdown.reduce((acc, b) => acc + b.contribution, 0)) * 100) / 100;
+    Math.round(
+      Math.min(
+        100,
+        breakdown.reduce((acc, b) => acc + b.contribution, 0),
+      ) * 100,
+    ) / 100;
 
   const threshold = (thresholds ?? []).find(
     (t) => sviScore >= Number(t.min_score) && sviScore <= Number(t.max_score),

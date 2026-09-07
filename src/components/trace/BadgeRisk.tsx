@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-export type RiskLevel = 'critical' | 'high' | 'moderate' | 'low';
+export type RiskLevel = "critical" | "high" | "moderate" | "low";
 
 interface Props {
   level: RiskLevel | string;
@@ -9,9 +9,9 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-export function BadgeRisk({ level, label, className = '', style }: Props) {
+export function BadgeRisk({ level, label, className = "", style }: Props) {
   const normLevel = level.toLowerCase();
-  const displayLabel = label ?? (normLevel.charAt(0).toUpperCase() + normLevel.slice(1));
+  const displayLabel = label ?? normLevel.charAt(0).toUpperCase() + normLevel.slice(1);
   return (
     <span className={`badge ${normLevel} ${className}`} style={style}>
       {displayLabel}

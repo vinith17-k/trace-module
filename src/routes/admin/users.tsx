@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useMemo } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { StaffLayout } from '@/components/trace/StaffLayout';
-import { Toast } from '@/components/trace/Toast';
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useMemo } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { StaffLayout } from "@/components/trace/StaffLayout";
+import { Toast } from "@/components/trace/Toast";
 
-export const Route = createFileRoute('/admin/users')({
+export const Route = createFileRoute("/admin/users")({
   component: UsersManagementPage,
 });
 
@@ -12,84 +12,84 @@ interface UserAccount {
   id: string;
   name: string;
   email: string;
-  role: 'Counsellor' | 'Law Enforcement' | 'District Magistrate' | 'System Admin';
+  role: "Counsellor" | "Law Enforcement" | "District Magistrate" | "System Admin";
   department: string;
   district: string;
-  status: 'Active' | 'Pending invite';
+  status: "Active" | "Pending invite";
   lastActive: string;
 }
 
 const INITIAL_USERS: UserAccount[] = [
   {
-    id: '1',
-    name: 'Priya Sharma',
-    email: 'priya.s@nhaa.gov.in',
-    role: 'Counsellor',
-    department: 'NHAA National Support Cell',
-    district: 'National',
-    status: 'Active',
-    lastActive: '4 min ago',
+    id: "1",
+    name: "Priya Sharma",
+    email: "priya.s@nhaa.gov.in",
+    role: "Counsellor",
+    department: "NHAA National Support Cell",
+    district: "National",
+    status: "Active",
+    lastActive: "4 min ago",
   },
   {
-    id: '2',
-    name: 'SI Rakesh Yadav',
-    email: 'r.yadav@police.mh.gov.in',
-    role: 'Law Enforcement',
-    department: 'Maharashtra Police (Pune Rural)',
-    district: 'Pune',
-    status: 'Active',
-    lastActive: '12 min ago',
+    id: "2",
+    name: "SI Rakesh Yadav",
+    email: "r.yadav@police.mh.gov.in",
+    role: "Law Enforcement",
+    department: "Maharashtra Police (Pune Rural)",
+    district: "Pune",
+    status: "Active",
+    lastActive: "12 min ago",
   },
   {
-    id: '3',
-    name: 'Anita Deshmukh, IAS',
-    email: 'a.deshmukh@socialjustice.gov.in',
-    role: 'District Magistrate',
-    department: 'District Atrocity Vigilance Committee',
-    district: 'Nagpur',
-    status: 'Active',
-    lastActive: '3 hr ago',
+    id: "3",
+    name: "Anita Deshmukh, IAS",
+    email: "a.deshmukh@socialjustice.gov.in",
+    role: "District Magistrate",
+    department: "District Atrocity Vigilance Committee",
+    district: "Nagpur",
+    status: "Active",
+    lastActive: "3 hr ago",
   },
   {
-    id: '4',
-    name: 'Dr. Ramesh Iyer',
-    email: 'r.iyer@socialjustice.gov.in',
-    role: 'System Admin',
-    department: 'Ministry of Social Justice & Empowerment',
-    district: 'New Delhi HQ',
-    status: 'Active',
-    lastActive: '1 hr ago',
+    id: "4",
+    name: "Dr. Ramesh Iyer",
+    email: "r.iyer@socialjustice.gov.in",
+    role: "System Admin",
+    department: "Ministry of Social Justice & Empowerment",
+    district: "New Delhi HQ",
+    status: "Active",
+    lastActive: "1 hr ago",
   },
   {
-    id: '5',
-    name: 'Inspector S. Gaikwad',
-    email: 's.gaikwad@police.mh.gov.in',
-    role: 'Law Enforcement',
-    department: 'Thane Commissionerate',
-    district: 'Thane',
-    status: 'Pending invite',
-    lastActive: 'Never',
+    id: "5",
+    name: "Inspector S. Gaikwad",
+    email: "s.gaikwad@police.mh.gov.in",
+    role: "Law Enforcement",
+    department: "Thane Commissionerate",
+    district: "Thane",
+    status: "Pending invite",
+    lastActive: "Never",
   },
 ];
 
 function UsersManagementPage() {
   useAuthGuard();
   const [users, setUsers] = useState<UserAccount[]>(INITIAL_USERS);
-  const [roleFilter, setRoleFilter] = useState('All');
-  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Invite form
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState<UserAccount['role']>('Counsellor');
-  const [department, setDepartment] = useState('District Atrocity Protection Unit');
-  const [district, setDistrict] = useState('Pune');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState<UserAccount["role"]>("Counsellor");
+  const [department, setDepartment] = useState("District Atrocity Protection Unit");
+  const [district, setDistrict] = useState("Pune");
 
   const filtered = useMemo(() => {
     return users.filter((u) => {
-      const matchRole = roleFilter === 'All' || u.role === roleFilter;
+      const matchRole = roleFilter === "All" || u.role === roleFilter;
       const matchSearch =
         !search.trim() ||
         u.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -110,14 +110,14 @@ function UsersManagementPage() {
       role,
       department,
       district,
-      status: 'Pending invite',
-      lastActive: 'Invitation sent',
+      status: "Pending invite",
+      lastActive: "Invitation sent",
     };
 
     setUsers([newUser, ...users]);
     setModalOpen(false);
-    setName('');
-    setEmail('');
+    setName("");
+    setEmail("");
     setToastMessage(`Encrypted setup credentials sent to ${email}.`);
   };
 
@@ -126,31 +126,29 @@ function UsersManagementPage() {
       <div className="auth-topline">
         <div>
           <h2>User &amp; Role Management</h2>
-          <p style={{ fontSize: 12.5, color: 'var(--a-muted)', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 12.5, color: "var(--a-muted)", margin: "4px 0 0" }}>
             Authorised government and medical personnel with role-based access scoping
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-dash"
-          onClick={() => setModalOpen(true)}
-        >
+        <button type="button" className="btn-dash" onClick={() => setModalOpen(true)}>
           + Invite Authorised User
         </button>
       </div>
 
       <div className="filter-row">
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {['All', 'Counsellor', 'Law Enforcement', 'District Magistrate', 'System Admin'].map((r) => (
-            <button
-              key={r}
-              type="button"
-              className={`chip ${roleFilter === r ? 'on' : ''}`}
-              onClick={() => setRoleFilter(r)}
-            >
-              {r}
-            </button>
-          ))}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+          {["All", "Counsellor", "Law Enforcement", "District Magistrate", "System Admin"].map(
+            (r) => (
+              <button
+                key={r}
+                type="button"
+                className={`chip ${roleFilter === r ? "on" : ""}`}
+                onClick={() => setRoleFilter(r)}
+              >
+                {r}
+              </button>
+            ),
+          )}
         </div>
 
         <input
@@ -182,18 +180,18 @@ function UsersManagementPage() {
                   <td>
                     <b>{u.name}</b>
                   </td>
-                  <td style={{ color: 'var(--a-muted)' }}>{u.email}</td>
+                  <td style={{ color: "var(--a-muted)" }}>{u.email}</td>
                   <td>
                     <span
                       className="tag"
                       style={{
                         borderColor:
-                          u.role === 'Law Enforcement'
-                            ? 'var(--a-accent)'
-                            : u.role === 'Counsellor'
-                              ? 'var(--a-low)'
-                              : 'var(--a-high)',
-                        color: '#fff',
+                          u.role === "Law Enforcement"
+                            ? "var(--a-accent)"
+                            : u.role === "Counsellor"
+                              ? "var(--a-low)"
+                              : "var(--a-high)",
+                        color: "#fff",
                       }}
                     >
                       {u.role}
@@ -205,21 +203,22 @@ function UsersManagementPage() {
                     <span
                       className="tag"
                       style={{
-                        color: u.status === 'Active' ? 'var(--a-low)' : 'var(--a-high)',
-                        borderColor: u.status === 'Active' ? 'rgba(111,162,135,0.4)' : 'rgba(224,162,61,0.4)',
+                        color: u.status === "Active" ? "var(--a-low)" : "var(--a-high)",
+                        borderColor:
+                          u.status === "Active" ? "rgba(111,162,135,0.4)" : "rgba(224,162,61,0.4)",
                       }}
                     >
                       {u.status}
                     </span>
                   </td>
-                  <td style={{ fontSize: 12, color: 'var(--a-muted)' }}>{u.lastActive}</td>
+                  <td style={{ fontSize: 12, color: "var(--a-muted)" }}>{u.lastActive}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap' }}>
-                      {u.status === 'Pending invite' ? (
+                    <div style={{ display: "flex", gap: 6, flexWrap: "nowrap" }}>
+                      {u.status === "Pending invite" ? (
                         <button
                           type="button"
                           className="btn-ghost"
-                          style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6 }}
+                          style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6 }}
                           onClick={() => {
                             setToastMessage(`Invite resent to ${u.email}.`);
                           }}
@@ -230,35 +229,38 @@ function UsersManagementPage() {
                         <button
                           type="button"
                           className="btn-ghost"
-                          style={{ fontSize: 11, padding: '3px 9px', borderRadius: 6 }}
+                          style={{ fontSize: 11, padding: "3px 9px", borderRadius: 6 }}
                           onClick={() => {
                             setUsers((prev) =>
                               prev.map((x) =>
                                 x.id === u.id
-                                  ? { ...x, status: x.status === 'Active' ? 'Pending invite' : 'Active' }
-                                  : x
-                              )
+                                  ? {
+                                      ...x,
+                                      status: x.status === "Active" ? "Pending invite" : "Active",
+                                    }
+                                  : x,
+                              ),
                             );
                             setToastMessage(
-                              u.status === 'Active'
+                              u.status === "Active"
                                 ? `${u.name} access suspended.`
-                                : `${u.name} reinstated.`
+                                : `${u.name} reinstated.`,
                             );
                           }}
                         >
-                          {u.status === 'Active' ? 'Suspend' : 'Reinstate'}
+                          {u.status === "Active" ? "Suspend" : "Reinstate"}
                         </button>
                       )}
                       <button
                         type="button"
                         style={{
                           fontSize: 11,
-                          padding: '3px 9px',
+                          padding: "3px 9px",
                           borderRadius: 6,
-                          background: 'none',
-                          border: '1px solid rgba(224,88,79,0.4)',
-                          color: 'var(--a-critical)',
-                          cursor: 'pointer',
+                          background: "none",
+                          border: "1px solid rgba(224,88,79,0.4)",
+                          color: "var(--a-critical)",
+                          cursor: "pointer",
                         }}
                         onClick={() => {
                           setUsers((prev) => prev.filter((x) => x.id !== u.id));
@@ -276,12 +278,15 @@ function UsersManagementPage() {
         </div>
       </div>
 
-
       {modalOpen && (
         <div className="confirm-modal-backdrop open" onClick={() => setModalOpen(false)}>
-          <div className="confirm-modal" style={{ maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
+          <div
+            className="confirm-modal"
+            style={{ maxWidth: 440 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Invite Authorised Personnel</h3>
-            <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '0 0 14px' }}>
+            <p style={{ fontSize: 13, color: "var(--a-muted)", margin: "0 0 14px" }}>
               Issue a secure authentication token for case management
             </p>
 
@@ -314,11 +319,15 @@ function UsersManagementPage() {
                 <select
                   className="field-input"
                   value={role}
-                  onChange={(e) => setRole(e.target.value as UserAccount['role'])}
+                  onChange={(e) => setRole(e.target.value as UserAccount["role"])}
                 >
                   <option value="Counsellor">Counsellor (Intake &amp; Triage)</option>
-                  <option value="Law Enforcement">Law Enforcement (Police &amp; Witness Escort)</option>
-                  <option value="District Magistrate">District Magistrate (Vigilance Monitoring)</option>
+                  <option value="Law Enforcement">
+                    Law Enforcement (Police &amp; Witness Escort)
+                  </option>
+                  <option value="District Magistrate">
+                    District Magistrate (Vigilance Monitoring)
+                  </option>
                   <option value="System Admin">System Admin (Full Configuration)</option>
                 </select>
               </div>
@@ -363,9 +372,7 @@ function UsersManagementPage() {
         </div>
       )}
 
-      {toastMessage && (
-        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
-      )}
+      {toastMessage && <Toast message={toastMessage} onDone={() => setToastMessage(null)} />}
     </StaffLayout>
   );
 }

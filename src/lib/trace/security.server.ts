@@ -41,7 +41,8 @@ function getEncryptionKey(): Buffer {
     return createHash("sha256").update(customKey, "utf8").digest();
   }
 
-  const fallbackSecret = process.env["SUPABASE_SERVICE_ROLE_KEY"] || "trace-dev-pii-default-secret-salt-2026";
+  const fallbackSecret =
+    process.env["SUPABASE_SERVICE_ROLE_KEY"] || "trace-dev-pii-default-secret-salt-2026";
   return createHash("sha256").update(`pii-encryption:${fallbackSecret}`, "utf8").digest();
 }
 
@@ -122,16 +123,19 @@ interface RateLimitBucket {
 const rateLimitStore = new Map<string, RateLimitBucket>();
 
 // Periodic cleanup of stale buckets every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  const maxWindow = 10 * 60 * 1000;
-  for (const [key, bucket] of rateLimitStore.entries()) {
-    bucket.timestamps = bucket.timestamps.filter((ts) => now - ts < maxWindow);
-    if (bucket.timestamps.length === 0) {
-      rateLimitStore.delete(key);
+setInterval(
+  () => {
+    const now = Date.now();
+    const maxWindow = 10 * 60 * 1000;
+    for (const [key, bucket] of rateLimitStore.entries()) {
+      bucket.timestamps = bucket.timestamps.filter((ts) => now - ts < maxWindow);
+      if (bucket.timestamps.length === 0) {
+        rateLimitStore.delete(key);
+      }
     }
-  }
-}, 5 * 60 * 1000).unref?.();
+  },
+  5 * 60 * 1000,
+).unref?.();
 
 /**
  * Sliding-window rate-limiter.

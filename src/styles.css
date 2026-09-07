@@ -138,7 +138,8 @@
     border-color: var(--color-border);
   }
 
-  html, body {
+  html,
+  body {
     min-height: 100%;
     margin: 0;
     padding: 0;
@@ -151,14 +152,14 @@
 
   /* Dynamically synchronize overscroll bounce with active portal theme */
   body:has(.auth) {
-    background-color: #171D25;
+    background-color: #171d25;
   }
 
   body:has(.victim) {
-    background-color: #FAF6F0;
+    background-color: #faf6f0;
   }
 
   body:has(.pub) {
-    background-color: #FBF7F0;
+    background-color: #fbf7f0;
   }
 }

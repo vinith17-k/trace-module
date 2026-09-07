@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface Props {
   message: string;
@@ -25,11 +25,11 @@ export function Toast({ message, onDone, duration = 5000 }: Props) {
 
   return (
     <div
-      className={`toast ${visible ? 'show' : ''}`}
+      className={`toast ${visible ? "show" : ""}`}
       role="status"
       aria-live="polite"
       aria-atomic="true"
-      style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'space-between' }}
+      style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between" }}
     >
       <span>{message}</span>
       <button
@@ -37,11 +37,11 @@ export function Toast({ message, onDone, duration = 5000 }: Props) {
         onClick={handleClose}
         aria-label="Dismiss notification"
         style={{
-          background: 'none',
-          border: 'none',
-          color: 'inherit',
-          cursor: 'pointer',
-          padding: '0 2px',
+          background: "none",
+          border: "none",
+          color: "inherit",
+          cursor: "pointer",
+          padding: "0 2px",
           fontSize: 16,
           lineHeight: 1,
           opacity: 0.7,

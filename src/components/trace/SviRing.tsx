@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface Props {
   score: number;
@@ -7,14 +7,15 @@ interface Props {
 }
 
 const RISK_COLORS: Record<string, string> = {
-  critical: '#E0584F',
-  high: '#E0A23D',
-  moderate: '#C9AF4A',
-  low: '#6FA287',
+  critical: "#E0584F",
+  high: "#E0A23D",
+  moderate: "#C9AF4A",
+  low: "#6FA287",
 };
 
 export function SviRing({ score, riskColor, riskCategory }: Props) {
-  const color = riskColor ?? (riskCategory ? RISK_COLORS[riskCategory.toLowerCase()] : '#5B8DEF') ?? '#5B8DEF';
+  const color =
+    riskColor ?? (riskCategory ? RISK_COLORS[riskCategory.toLowerCase()] : "#5B8DEF") ?? "#5B8DEF";
   const r = 46;
   const circ = 2 * Math.PI * r;
   const clamped = Math.min(100, Math.max(0, score));
@@ -62,9 +63,9 @@ export function SviRing({ score, riskColor, riskCategory }: Props) {
           strokeDashoffset={offset}
           strokeLinecap="round"
           style={{
-            transform: 'rotate(-90deg)',
-            transformOrigin: '55px 55px',
-            transition: 'stroke-dashoffset 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            transform: "rotate(-90deg)",
+            transformOrigin: "55px 55px",
+            transition: "stroke-dashoffset 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)",
           }}
         />
       </svg>

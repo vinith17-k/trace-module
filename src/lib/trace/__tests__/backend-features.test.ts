@@ -115,8 +115,20 @@ describe("Core Pipeline — Fallback & Explainability", () => {
     ];
 
     const weights = [
-      { signal_type: "sentiment", signal_key: "distress", weight: 22, max_contribution: 22, config_version: 1 },
-      { signal_type: "keyword_flag", signal_key: "default", weight: 10, max_contribution: 25, config_version: 1 },
+      {
+        signal_type: "sentiment",
+        signal_key: "distress",
+        weight: 22,
+        max_contribution: 22,
+        config_version: 1,
+      },
+      {
+        signal_type: "keyword_flag",
+        signal_key: "default",
+        weight: 10,
+        max_contribution: 25,
+        config_version: 1,
+      },
     ];
 
     const thresholds = [
@@ -130,7 +142,8 @@ describe("Core Pipeline — Fallback & Explainability", () => {
       if (table === "stress_signals") return makeQuery({ data: signals, error: null });
       if (table === "svi_weights") return makeQuery({ data: weights, error: null });
       if (table === "risk_thresholds") return makeQuery({ data: thresholds, error: null });
-      if (table === "svi_assessments") return makeQuery({ data: { id: "mock-partial-assessment" }, error: null });
+      if (table === "svi_assessments")
+        return makeQuery({ data: { id: "mock-partial-assessment" }, error: null });
       return makeQuery({ data: null, error: null });
     });
 
@@ -144,7 +157,12 @@ describe("Core Pipeline — Fallback & Explainability", () => {
       if (table === "risk_lexicon") {
         return makeQuery({
           data: [
-            { phrase: "kill myself", indicator: "suicidal_ideation", severity: 1.0, language_code: "en" },
+            {
+              phrase: "kill myself",
+              indicator: "suicidal_ideation",
+              severity: 1.0,
+              language_code: "en",
+            },
             { phrase: "threatened", indicator: "intimidation", severity: 0.8, language_code: "en" },
           ],
           error: null,

@@ -51,7 +51,8 @@ serve(async (req: Request) => {
       (rules ?? []).find(
         (r: Record<string, unknown>) =>
           r["risk_category"] === assessment.risk_category &&
-          (r["required_indicator"] === null || indicators.includes(r["required_indicator"] as string)),
+          (r["required_indicator"] === null ||
+            indicators.includes(r["required_indicator"] as string)),
       ) ?? null;
 
     const actionType = (rule?.["action_type"] ?? "counselling") as string;
@@ -73,7 +74,8 @@ serve(async (req: Request) => {
     const criticalEscalation =
       assessment.risk_category === "critical" &&
       (indicators.includes("suicidal_ideation") || indicators.includes("intimidation"));
-    const escalate = Boolean(rule?.["auto_escalate"]) || criticalEscalation || priority === "immediate";
+    const escalate =
+      Boolean(rule?.["auto_escalate"]) || criticalEscalation || priority === "immediate";
 
     if (escalate) {
       await db.from("escalation_log").insert({
@@ -85,7 +87,11 @@ serve(async (req: Request) => {
     }
 
     let notified = false;
-    if (priority === "immediate" || actionType === "police_intervention" || actionType === "witness_protection") {
+    if (
+      priority === "immediate" ||
+      actionType === "police_intervention" ||
+      actionType === "witness_protection"
+    ) {
       // Chain to notify-authority edge function.
       const fnUrl = `${supabaseUrl}/functions/v1/notify-authority`;
       const notifyRes = await fetch(fnUrl, {

@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { StaffLayout } from '@/components/trace/StaffLayout';
-import { BadgeRisk } from '@/components/trace/BadgeRisk';
-import { Toast } from '@/components/trace/Toast';
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { StaffLayout } from "@/components/trace/StaffLayout";
+import { BadgeRisk } from "@/components/trace/BadgeRisk";
+import { Toast } from "@/components/trace/Toast";
 
-export const Route = createFileRoute('/admin/rules')({
+export const Route = createFileRoute("/admin/rules")({
   component: RecommendationRulesPage,
 });
 
@@ -13,17 +13,52 @@ interface RuleItem {
   id: string;
   trigger: string;
   action: string;
-  priority: 'critical' | 'high' | 'moderate' | 'low';
+  priority: "critical" | "high" | "moderate" | "low";
   priorityLabel: string;
   authority: string;
 }
 
 const INITIAL_RULES: RuleItem[] = [
-  { id: '1', trigger: 'Critical + suicidal ideation', action: 'Emergency Mental Health Crisis Team + Police Escort', priority: 'critical', priorityLabel: 'Immediate', authority: 'District Crisis Team / 108' },
-  { id: '2', trigger: 'Critical + intimidation & threats', action: 'Immediate Armed Escort + Safehouse Relocation', priority: 'critical', priorityLabel: 'Immediate', authority: 'State Police / Witness Protection Cell' },
-  { id: '3', trigger: 'High + social isolation & boycott', action: 'District Legal Aid Support + Social Justice Officer', priority: 'high', priorityLabel: 'Urgent', authority: 'DLSA / District Administration' },
-  { id: '4', trigger: 'Moderate + depression & trauma cues', action: 'Trauma-informed clinical counselling session', priority: 'moderate', priorityLabel: 'Routine', authority: 'NHAA Counselling Network' },
-  { id: '5', trigger: 'Low + general stress / inquiry', action: 'Atrocities Act Rights Pamphlet + Self-Help Resources', priority: 'low', priorityLabel: 'Routine', authority: 'NHAA Digital Portal' },
+  {
+    id: "1",
+    trigger: "Critical + suicidal ideation",
+    action: "Emergency Mental Health Crisis Team + Police Escort",
+    priority: "critical",
+    priorityLabel: "Immediate",
+    authority: "District Crisis Team / 108",
+  },
+  {
+    id: "2",
+    trigger: "Critical + intimidation & threats",
+    action: "Immediate Armed Escort + Safehouse Relocation",
+    priority: "critical",
+    priorityLabel: "Immediate",
+    authority: "State Police / Witness Protection Cell",
+  },
+  {
+    id: "3",
+    trigger: "High + social isolation & boycott",
+    action: "District Legal Aid Support + Social Justice Officer",
+    priority: "high",
+    priorityLabel: "Urgent",
+    authority: "DLSA / District Administration",
+  },
+  {
+    id: "4",
+    trigger: "Moderate + depression & trauma cues",
+    action: "Trauma-informed clinical counselling session",
+    priority: "moderate",
+    priorityLabel: "Routine",
+    authority: "NHAA Counselling Network",
+  },
+  {
+    id: "5",
+    trigger: "Low + general stress / inquiry",
+    action: "Atrocities Act Rights Pamphlet + Self-Help Resources",
+    priority: "low",
+    priorityLabel: "Routine",
+    authority: "NHAA Digital Portal",
+  },
 ];
 
 function RecommendationRulesPage() {
@@ -33,11 +68,13 @@ function RecommendationRulesPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Form states
-  const [riskTier, setRiskTier] = useState<RuleItem['priority']>('critical');
-  const [cue, setCue] = useState('Physical threat / Assault');
-  const [actionText, setActionText] = useState('Immediate Police Protection & Medical Aid');
-  const [authorityText, setAuthorityText] = useState('Superintendent of Police / Special Court Cell');
-  const [priorityTier, setPriorityTier] = useState('Immediate');
+  const [riskTier, setRiskTier] = useState<RuleItem["priority"]>("critical");
+  const [cue, setCue] = useState("Physical threat / Assault");
+  const [actionText, setActionText] = useState("Immediate Police Protection & Medical Aid");
+  const [authorityText, setAuthorityText] = useState(
+    "Superintendent of Police / Special Court Cell",
+  );
+  const [priorityTier, setPriorityTier] = useState("Immediate");
 
   const handleAddRule = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +93,7 @@ function RecommendationRulesPage() {
 
   const handleDeleteRule = (id: string) => {
     setRules(rules.filter((r) => r.id !== id));
-    setToastMessage('Rule removed from dispatch engine.');
+    setToastMessage("Rule removed from dispatch engine.");
   };
 
   return (
@@ -64,21 +101,19 @@ function RecommendationRulesPage() {
       <div className="auth-topline">
         <div>
           <h2>Recommendation Rules Engine</h2>
-          <p style={{ fontSize: 12.5, color: 'var(--a-muted)', margin: '4px 0 0' }}>
-            Decision matrix that transforms detected trauma signals and SVI risk into immediate authority dispatches
+          <p style={{ fontSize: 12.5, color: "var(--a-muted)", margin: "4px 0 0" }}>
+            Decision matrix that transforms detected trauma signals and SVI risk into immediate
+            authority dispatches
           </p>
         </div>
-        <button
-          type="button"
-          className="btn-dash"
-          onClick={() => setModalOpen(true)}
-        >
+        <button type="button" className="btn-dash" onClick={() => setModalOpen(true)}>
           + Add Rule
         </button>
       </div>
 
-      <p className="inline-legend" style={{ margin: '0 0 16px', display: 'inline-block' }}>
-        The TRACE pipeline matches incoming victim signals against these rules in order of precedence (Critical → High → Moderate → Low).
+      <p className="inline-legend" style={{ margin: "0 0 16px", display: "inline-block" }}>
+        The TRACE pipeline matches incoming victim signals against these rules in order of
+        precedence (Critical → High → Moderate → Low).
       </p>
 
       <div className="panel" style={{ padding: 0 }}>
@@ -100,7 +135,7 @@ function RecommendationRulesPage() {
                     <b>{r.trigger}</b>
                   </td>
                   <td>{r.action}</td>
-                  <td style={{ fontSize: 12.5, color: 'var(--a-muted)' }}>{r.authority}</td>
+                  <td style={{ fontSize: 12.5, color: "var(--a-muted)" }}>{r.authority}</td>
                   <td>
                     <BadgeRisk level={r.priority} label={r.priorityLabel} />
                   </td>
@@ -108,7 +143,7 @@ function RecommendationRulesPage() {
                     <button
                       type="button"
                       className="btn-ghost"
-                      style={{ padding: '4px 8px', fontSize: 11, color: 'var(--a-critical)' }}
+                      style={{ padding: "4px 8px", fontSize: 11, color: "var(--a-critical)" }}
                       onClick={() => handleDeleteRule(r.id)}
                     >
                       Delete
@@ -123,9 +158,13 @@ function RecommendationRulesPage() {
 
       {modalOpen && (
         <div className="confirm-modal-backdrop open" onClick={() => setModalOpen(false)}>
-          <div className="confirm-modal" style={{ maxWidth: 460 }} onClick={(e) => e.stopPropagation()}>
+          <div
+            className="confirm-modal"
+            style={{ maxWidth: 460 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3>Add New Recommendation Rule</h3>
-            <p style={{ fontSize: 13, color: 'var(--a-muted)', margin: '0 0 14px' }}>
+            <p style={{ fontSize: 13, color: "var(--a-muted)", margin: "0 0 14px" }}>
               Define condition matching and resulting authority dispatch
             </p>
 
@@ -135,7 +174,7 @@ function RecommendationRulesPage() {
                 <select
                   className="field-input"
                   value={riskTier}
-                  onChange={(e) => setRiskTier(e.target.value as RuleItem['priority'])}
+                  onChange={(e) => setRiskTier(e.target.value as RuleItem["priority"])}
                 >
                   <option value="critical">Critical (SVI 80–100)</option>
                   <option value="high">High (SVI 60–79)</option>
@@ -203,9 +242,7 @@ function RecommendationRulesPage() {
         </div>
       )}
 
-      {toastMessage && (
-        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
-      )}
+      {toastMessage && <Toast message={toastMessage} onDone={() => setToastMessage(null)} />}
     </StaffLayout>
   );
 }

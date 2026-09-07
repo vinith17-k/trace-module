@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface Props {
   label: string;
@@ -6,7 +6,7 @@ interface Props {
   color?: string;
 }
 
-export function SignalBar({ label, value, color = 'var(--a-accent)' }: Props) {
+export function SignalBar({ label, value, color = "var(--a-accent)" }: Props) {
   const pct = Math.round(Math.min(100, Math.max(0, value)));
   return (
     <div className="signal-row">

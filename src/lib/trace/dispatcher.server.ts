@@ -9,9 +9,7 @@
  */
 import { rerunPipeline, runFullPipeline } from "./pipeline.server";
 
-type Admin = Awaited<
-  typeof import("@/integrations/supabase/client.server")
->["supabaseAdmin"];
+type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 
 async function admin(): Promise<Admin> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -176,7 +174,10 @@ export async function processPendingInteractions(batchSize = 10): Promise<QueueP
 /**
  * Re-attempts failed pipeline runs where attempts are below maxAttempts.
  */
-export async function retryFailedPipelineRuns(maxAttempts = 3, batchSize = 10): Promise<QueueProcessorResult> {
+export async function retryFailedPipelineRuns(
+  maxAttempts = 3,
+  batchSize = 10,
+): Promise<QueueProcessorResult> {
   const db = await admin();
 
   const { data: failedItems, error } = await db

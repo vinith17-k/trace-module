@@ -41,15 +41,21 @@ serve(async (req: Request) => {
         .select("signal_type, value, numeric_value, confidence")
         .eq("interaction_id", interaction_id)
         .is("deleted_at", null),
-      db.from("svi_weights").select("signal_type, signal_key, weight, max_contribution").eq("active", true),
+      db
+        .from("svi_weights")
+        .select("signal_type, signal_key, weight, max_contribution")
+        .eq("active", true),
       db.from("risk_thresholds").select("risk_category, min_score, max_score"),
     ]);
 
     if (!signals || signals.length === 0) {
-      return new Response(JSON.stringify({ error: "No stress signals found for this interaction" }), {
-        status: 422,
-        headers: { ...CORS, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "No stress signals found for this interaction" }),
+        {
+          status: 422,
+          headers: { ...CORS, "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Weighted-scoring formula:
@@ -59,18 +65,33 @@ serve(async (req: Request) => {
     const buckets = new Map<string, { signal_type: string; key: string; sum: number }>();
     const indicatorSet = new Set<string>();
 
-    for (const s of (signals as Array<{ signal_type: string; value: unknown; numeric_value: number | null; confidence: number | null }>)) {
+    for (const s of signals as Array<{
+      signal_type: string;
+      value: unknown;
+      numeric_value: number | null;
+      confidence: number | null;
+    }>) {
       const value = (s.value ?? {}) as Record<string, unknown>;
       const key = typeof value["key"] === "string" ? value["key"] : "default";
       const normalised = clamp01(s.numeric_value ?? 0);
       const confidenceFactor = 0.5 + 0.5 * clamp01(s.confidence ?? 0.5);
       const weightRow =
-        (weights as Array<{ signal_type: string; signal_key: string; weight: number; max_contribution: number }>)?.find(
-          (w) => w.signal_type === s.signal_type && w.signal_key === key,
-        ) ??
-        (weights as Array<{ signal_type: string; signal_key: string; weight: number; max_contribution: number }>)?.find(
-          (w) => w.signal_type === s.signal_type && w.signal_key === "default",
-        );
+        (
+          weights as Array<{
+            signal_type: string;
+            signal_key: string;
+            weight: number;
+            max_contribution: number;
+          }>
+        )?.find((w) => w.signal_type === s.signal_type && w.signal_key === key) ??
+        (
+          weights as Array<{
+            signal_type: string;
+            signal_key: string;
+            weight: number;
+            max_contribution: number;
+          }>
+        )?.find((w) => w.signal_type === s.signal_type && w.signal_key === "default");
       if (!weightRow) continue;
 
       const contribution = normalised * confidenceFactor * Number(weightRow.weight);
@@ -80,7 +101,8 @@ serve(async (req: Request) => {
       buckets.set(id, bucket);
 
       if (s.signal_type === "sentiment" && normalised >= INDICATOR_THRESHOLD) indicatorSet.add(key);
-      if (s.signal_type === "keyword_flag" && typeof value["indicator"] === "string") indicatorSet.add(value["indicator"] as string);
+      if (s.signal_type === "keyword_flag" && typeof value["indicator"] === "string")
+        indicatorSet.add(value["indicator"] as string);
     }
 
     const breakdown = [...buckets.values()].map((b) => ({
@@ -88,11 +110,17 @@ serve(async (req: Request) => {
       key: b.key,
       contribution: Math.round(b.sum * 100) / 100,
     }));
-    const sviScore = Math.round(Math.min(100, breakdown.reduce((acc, b) => acc + b.contribution, 0)) * 100) / 100;
+    const sviScore =
+      Math.round(
+        Math.min(
+          100,
+          breakdown.reduce((acc, b) => acc + b.contribution, 0),
+        ) * 100,
+      ) / 100;
 
-    const threshold = (thresholds as Array<{ risk_category: string; min_score: number; max_score: number }> ?? []).find(
-      (t) => sviScore >= Number(t.min_score) && sviScore <= Number(t.max_score),
-    );
+    const threshold = (
+      (thresholds as Array<{ risk_category: string; min_score: number; max_score: number }>) ?? []
+    ).find((t) => sviScore >= Number(t.min_score) && sviScore <= Number(t.max_score));
     const riskCategory = threshold?.risk_category ?? "low";
     const traumaIndicators = [...indicatorSet];
 

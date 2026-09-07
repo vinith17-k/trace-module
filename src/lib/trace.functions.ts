@@ -35,7 +35,9 @@ export const submitInteraction = createServerFn({ method: "POST" })
     // 1. Rate-limiting check (per-channel or default anonymous bucket)
     const rateCheck = checkSubmitRateLimit(data.idempotencyKey ?? data.channel);
     if (!rateCheck.allowed) {
-      throw new Error(`Rate limit exceeded. Please wait ${rateCheck.retryAfterSec ?? 60} seconds before submitting.`);
+      throw new Error(
+        `Rate limit exceeded. Please wait ${rateCheck.retryAfterSec ?? 60} seconds before submitting.`,
+      );
     }
 
     if (!data.rawText && !data.audioUrl) {
@@ -174,7 +176,9 @@ export const getStatusByRef = createServerFn({ method: "POST" })
     // Throttling protection against brute-force discovery of reference codes
     const rateCheck = checkStatusLookupRateLimit("public_lookup");
     if (!rateCheck.allowed) {
-      throw new Error(`Too many status lookups. Please wait ${rateCheck.retryAfterSec ?? 60} seconds.`);
+      throw new Error(
+        `Too many status lookups. Please wait ${rateCheck.retryAfterSec ?? 60} seconds.`,
+      );
     }
 
     const refHash = hashReferenceId(data.refId);
@@ -183,7 +187,9 @@ export const getStatusByRef = createServerFn({ method: "POST" })
     const { data: interaction } = await supabaseAdmin
       .from("interactions")
       .select("id, consent_pending, pipeline_status, created_at")
-      .or(`anonymized_ref_hash.eq.${refHash},anonymized_ref_id.eq.${data.refId.trim().toUpperCase()}`)
+      .or(
+        `anonymized_ref_hash.eq.${refHash},anonymized_ref_id.eq.${data.refId.trim().toUpperCase()}`,
+      )
       .is("deleted_at", null)
       .maybeSingle();
 
@@ -242,7 +248,10 @@ export const getCaseDashboard = createServerFn({ method: "POST" })
 
     const { data: assessments, count: totalCount } = await supabase
       .from("svi_assessments")
-      .select("id, interaction_id, svi_score, risk_category, trauma_indicators, partial, computed_at", { count: "exact" })
+      .select(
+        "id, interaction_id, svi_score, risk_category, trauma_indicators, partial, computed_at",
+        { count: "exact" },
+      )
       .is("deleted_at", null)
       .order("computed_at", { ascending: false })
       .range(offset, offset + pageSize - 1);
@@ -333,7 +342,9 @@ export const linkVictimIdentity = createServerFn({ method: "POST" })
       ...(data.contactNumber !== undefined && { contact_number: encryptField(data.contactNumber) }),
       ...(data.email !== undefined && { email: encryptField(data.email) }),
       ...(data.address !== undefined && { address: encryptField(data.address) }),
-      ...(data.assignedCounsellorId !== undefined && { assigned_counsellor_id: data.assignedCounsellorId }),
+      ...(data.assignedCounsellorId !== undefined && {
+        assigned_counsellor_id: data.assignedCounsellorId,
+      }),
     };
 
     let identityId: string;
@@ -520,4 +531,3 @@ export const runScheduledMaintenance = createServerFn({ method: "POST" })
       purgedRawMediaCount: purgedCount,
     };
   });
-

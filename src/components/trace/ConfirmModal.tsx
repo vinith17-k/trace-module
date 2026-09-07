@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react';
+import React, { useEffect, useId, useState } from "react";
 
 interface Props {
   open: boolean;
@@ -16,30 +16,30 @@ export function ConfirmModal({
   open,
   title,
   body,
-  confirmLabel = 'Confirm',
-  confirmClass = 'btn-dash',
+  confirmLabel = "Confirm",
+  confirmClass = "btn-dash",
   showNote,
-  noteLabel = 'Add a note or context...',
+  noteLabel = "Add a note or context...",
   onConfirm,
   onCancel,
 }: Props) {
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState("");
   const titleId = useId();
 
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCancel();
+      if (event.key === "Escape") onCancel();
     };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [onCancel, open]);
 
   if (!open) return null;
 
   return (
     <div
-      className={`confirm-modal-backdrop ${open ? 'open' : ''}`}
+      className={`confirm-modal-backdrop ${open ? "open" : ""}`}
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
@@ -65,7 +65,7 @@ export function ConfirmModal({
             className={confirmClass}
             onClick={() => {
               onConfirm(note);
-              setNote('');
+              setNote("");
             }}
           >
             {confirmLabel}

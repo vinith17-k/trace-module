@@ -59,7 +59,8 @@ async function callLLM(system: string, user: string): Promise<unknown | null> {
 }
 
 async function detectLanguage(text: string, hint?: string): Promise<string> {
-  if (hint && hint !== "auto" && (SUPPORTED_LANGUAGES as readonly string[]).includes(hint)) return hint;
+  if (hint && hint !== "auto" && (SUPPORTED_LANGUAGES as readonly string[]).includes(hint))
+    return hint;
   const result = (await callLLM(
     `You are a language identifier. Reply with JSON only: {"language_code":"<ISO 639-1>"}. Choose from: ${SUPPORTED_LANGUAGES.join(", ")}. If unsure, use "en".`,
     text.slice(0, 2000),
@@ -99,10 +100,9 @@ serve(async (req: Request) => {
       | (Partial<Record<EmotionKey, number>> & { confidence?: number; rationale_tags?: string[] })
       | null;
 
-    const emotions = Object.fromEntries(EMOTION_KEYS.map((k) => [k, clamp01(llm?.[k] ?? 0)])) as Record<
-      EmotionKey,
-      number
-    >;
+    const emotions = Object.fromEntries(
+      EMOTION_KEYS.map((k) => [k, clamp01(llm?.[k] ?? 0)]),
+    ) as Record<EmotionKey, number>;
     const emotionConfidence = llm ? clamp01(llm.confidence ?? 0.7) : 0;
 
     // Keyword / lexicon flags
@@ -111,13 +111,24 @@ serve(async (req: Request) => {
       .select("phrase, indicator, severity, language_code")
       .eq("active", true);
 
-    const keywordMatches = ((lexicon ?? []) as Array<{ language_code: string; phrase: string; indicator: string; severity: number }>)
+    const keywordMatches = (
+      (lexicon ?? []) as Array<{
+        language_code: string;
+        phrase: string;
+        indicator: string;
+        severity: number;
+      }>
+    )
       .filter(
         (row) =>
           (row.language_code === languageCode || row.language_code === "en") &&
           lower.includes(String(row.phrase).toLowerCase()),
       )
-      .map((row) => ({ phrase: row.phrase, indicator: row.indicator, severity: Number(row.severity) }));
+      .map((row) => ({
+        phrase: row.phrase,
+        indicator: row.indicator,
+        severity: Number(row.severity),
+      }));
 
     const rows = [] as Array<Record<string, unknown>>;
 
@@ -159,7 +170,12 @@ serve(async (req: Request) => {
     await db.from("interactions").update({ language_code: languageCode }).eq("id", interaction_id);
 
     return new Response(
-      JSON.stringify({ signals_written: rows.length, language_code: languageCode, emotions, keyword_matches: keywordMatches }),
+      JSON.stringify({
+        signals_written: rows.length,
+        language_code: languageCode,
+        emotions,
+        keyword_matches: keywordMatches,
+      }),
       { headers: { ...CORS, "Content-Type": "application/json" } },
     );
   } catch (err: unknown) {

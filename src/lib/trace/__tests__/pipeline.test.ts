@@ -95,10 +95,7 @@ describe("computeSvi — weighted scoring formula", () => {
   });
 
   it("returns risk_category='low' for all-zero signals", async () => {
-    setupMocks([
-      signal("sentiment", "distress", 0, 0.9),
-      signal("sentiment", "fear", 0, 0.9),
-    ]);
+    setupMocks([signal("sentiment", "distress", 0, 0.9), signal("sentiment", "fear", 0, 0.9)]);
     const result = await computeSvi("interaction-1");
     expect(result.sviScore).toBe(0);
     expect(result.riskCategory).toBe("low");
@@ -175,7 +172,9 @@ describe("computeSvi — weighted scoring formula", () => {
 
   it("max_contribution caps a single signal bucket", async () => {
     // We set max_contribution=5 on distress — even with contribution=11, cap=5.
-    const customWeights = [{ signal_type: "sentiment", signal_key: "distress", weight: 22, max_contribution: 5 }];
+    const customWeights = [
+      { signal_type: "sentiment", signal_key: "distress", weight: 22, max_contribution: 5 },
+    ];
     setupMocks([signal("sentiment", "distress", 1, 1)], customWeights, BASE_THRESHOLDS);
     const result = await computeSvi("interaction-cap");
     expect(result.sviScore).toBeLessThanOrEqual(5);
@@ -189,10 +188,7 @@ describe("computeSvi — weighted scoring formula", () => {
   });
 
   it("breakdown contains one entry per (signal_type, key) bucket", async () => {
-    setupMocks([
-      signal("sentiment", "distress", 0.5, 0.9),
-      signal("sentiment", "fear", 0.3, 0.9),
-    ]);
+    setupMocks([signal("sentiment", "distress", 0.5, 0.9), signal("sentiment", "fear", 0.3, 0.9)]);
     const result = await computeSvi("interaction-breakdown");
     const types = result.breakdown.map((b) => `${b.signal_type}:${b.key}`);
     expect(types).toContain("sentiment:distress");

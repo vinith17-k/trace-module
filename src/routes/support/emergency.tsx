@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { VictimLayout } from '@/components/trace/VictimLayout';
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { VictimLayout } from "@/components/trace/VictimLayout";
 
-export const Route = createFileRoute('/support/emergency')({
+export const Route = createFileRoute("/support/emergency")({
   component: EmergencyOverlayPage,
 });
 
@@ -11,28 +11,31 @@ function EmergencyOverlayPage() {
   // Determine which intake channel to return to
   const returnChannel = (() => {
     try {
-      const result = sessionStorage.getItem('trace_result');
+      const result = sessionStorage.getItem("trace_result");
       if (result) {
         const parsed = JSON.parse(result);
-        if (parsed.channel === 'voice') return '/support/voice';
+        if (parsed.channel === "voice") return "/support/voice";
       }
       // Check if voice page was in progress
-      const voiceActive = sessionStorage.getItem('trace_channel');
-      if (voiceActive === 'voice') return '/support/voice';
-    } catch { /* ignore */ }
-    return '/support/chat';
+      const voiceActive = sessionStorage.getItem("trace_channel");
+      if (voiceActive === "voice") return "/support/voice";
+    } catch {
+      /* ignore */
+    }
+    return "/support/chat";
   })();
-
 
   return (
     <VictimLayout showLangBar={false}>
-      <div className="v-stage" style={{ position: 'relative', minHeight: 480 }}>
+      <div className="v-stage" style={{ position: "relative", minHeight: 480 }}>
         {/* Background blurred simulation */}
-        <div className="v-card" style={{ filter: 'blur(6px)', opacity: 0.35 }} aria-hidden="true">
+        <div className="v-card" style={{ filter: "blur(6px)", opacity: 0.35 }} aria-hidden="true">
           <div className="chat-window">
             <div className="bubble-row">
               <div>
-                <div className="bubble sys">I'm really glad you told me. You're not alone in this.</div>
+                <div className="bubble sys">
+                  I'm really glad you told me. You're not alone in this.
+                </div>
               </div>
             </div>
             <div className="bubble-row user">
@@ -53,7 +56,8 @@ function EmergencyOverlayPage() {
           <div className="emergency-panel">
             <h3>We're here to help right now</h3>
             <p>
-              It sounds like you may be in immediate danger or distress. Tap a number below to call immediately — these calls are free.
+              It sounds like you may be in immediate danger or distress. Tap a number below to call
+              immediately — these calls are free.
             </p>
             <div className="helpline-row">
               <span>NHAA Helpline (24/7)</span>
@@ -83,10 +87,10 @@ function EmergencyOverlayPage() {
             <a
               className="btn btn-block tel-link"
               style={{
-                background: 'var(--v-emergency)',
-                color: '#fff',
+                background: "var(--v-emergency)",
+                color: "#fff",
                 marginTop: 16,
-                textDecoration: 'none',
+                textDecoration: "none",
               }}
               href="tel:14566"
             >
@@ -97,14 +101,16 @@ function EmergencyOverlayPage() {
               type="button"
               className="btn btn-block"
               style={{
-                background: 'transparent',
-                border: '1.5px solid var(--v-border)',
-                color: '#5A5343',
+                background: "transparent",
+                border: "1.5px solid var(--v-border)",
+                color: "#5A5343",
                 marginTop: 10,
               }}
-              onClick={() => navigate({ to: returnChannel as any })}
+              onClick={() => navigate({ to: returnChannel as "/support/voice" | "/support/chat" })}
             >
-              {returnChannel === '/support/voice' ? 'Back to voice recording' : 'Keep chatting instead'}
+              {returnChannel === "/support/voice"
+                ? "Back to voice recording"
+                : "Keep chatting instead"}
             </button>
           </div>
         </div>

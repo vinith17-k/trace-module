@@ -21,7 +21,8 @@ serve(async (req: Request) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const publishableKey = Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY")!;
+    const publishableKey =
+      Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY")!;
 
     // Extract user JWT from Authorization header.
     const authHeader = req.headers.get("Authorization");
@@ -61,17 +62,16 @@ serve(async (req: Request) => {
     const offset = (page - 1) * pageSize;
 
     // Fetch roles for the calling user.
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId);
+    const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
     const roleList = (roles ?? []).map((r: { role: string }) => r.role);
     const isPrivileged = roleList.includes("admin") || roleList.includes("counsellor");
 
     // Paginated assessments (RLS filters rows automatically).
     const { data: assessments, count: totalAssessments } = await supabase
       .from("svi_assessments")
-      .select("id, interaction_id, svi_score, risk_category, trauma_indicators, computed_at", { count: "exact" })
+      .select("id, interaction_id, svi_score, risk_category, trauma_indicators, computed_at", {
+        count: "exact",
+      })
       .is("deleted_at", null)
       .order("computed_at", { ascending: false })
       .range(offset, offset + pageSize - 1);

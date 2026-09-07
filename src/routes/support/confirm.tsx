@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { VictimLayout } from '@/components/trace/VictimLayout';
-import { Toast } from '@/components/trace/Toast';
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { VictimLayout } from "@/components/trace/VictimLayout";
+import { Toast } from "@/components/trace/Toast";
 
-export const Route = createFileRoute('/support/confirm')({
+export const Route = createFileRoute("/support/confirm")({
   component: PostIntakeConfirmationPage,
 });
 
@@ -24,13 +24,13 @@ function PostIntakeConfirmationPage() {
   const navigate = useNavigate();
   const [result, setResult] = useState<StoredResult | null>(null);
   const [copied, setCopied] = useState(false);
-  const [phoneInput, setPhoneInput] = useState('');
+  const [phoneInput, setPhoneInput] = useState("");
   const [showSmsBox, setShowSmsBox] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem('trace_result');
+      const raw = sessionStorage.getItem("trace_result");
       if (raw) {
         setResult(JSON.parse(raw));
       }
@@ -43,23 +43,22 @@ function PostIntakeConfirmationPage() {
     result?.anonymizedRefId ??
     (result?.interactionId
       ? `NHAA-${result.interactionId.slice(0, 4).toUpperCase()}-K91`
-      : 'NHAA-4F82-K91');
+      : "NHAA-4F82-K91");
 
-  const isHighRisk =
-    result?.riskCategory === 'critical' || result?.riskCategory === 'high';
+  const isHighRisk = result?.riskCategory === "critical" || result?.riskCategory === "high";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(refId);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
-    setToastMessage('Reference ID copied to clipboard.');
+    setToastMessage("Reference ID copied to clipboard.");
   };
 
   const handleSendSms = (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneInput.trim()) return;
     setShowSmsBox(false);
-    setPhoneInput('');
+    setPhoneInput("");
     setToastMessage(`Reference ID ${refId} sent securely to mobile.`);
   };
 
@@ -70,8 +69,8 @@ function PostIntakeConfirmationPage() {
     } catch {
       // ignore
     }
-    setToastMessage('Session data cleared from this browser.');
-    setTimeout(() => navigate({ to: '/' }), 1000);
+    setToastMessage("Session data cleared from this browser.");
+    setTimeout(() => navigate({ to: "/" }), 1000);
   };
 
   return (
@@ -87,41 +86,53 @@ function PostIntakeConfirmationPage() {
             <p
               className="v-lead"
               style={{
-                background: 'var(--v-emergency-bg)',
-                color: '#7A3324',
-                padding: '12px 14px',
+                background: "var(--v-emergency-bg)",
+                color: "#7A3324",
+                padding: "12px 14px",
                 borderRadius: 10,
                 fontWeight: 600,
               }}
             >
-              Based on what you've told us, this looks urgent — a counsellor is being connected to you right now, not just scheduled for later.
+              Based on what you've told us, this looks urgent — a counsellor is being connected to
+              you right now, not just scheduled for later.
             </p>
           ) : (
             <p className="v-lead">
-              Your message has been received with care. A trained support counsellor will review your details shortly.
+              Your message has been received with care. A trained support counsellor will review
+              your details shortly.
             </p>
           )}
 
           {/* Reference ID Box with Copy Button */}
           <div
             style={{
-              background: '#F5F1E7',
-              border: '1.5px solid var(--v-border)',
+              background: "#F5F1E7",
+              border: "1.5px solid var(--v-border)",
               borderRadius: 12,
-              padding: '14px 18px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              margin: '14px 0 10px',
+              padding: "14px 18px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              margin: "14px 0 10px",
               gap: 12,
-              flexWrap: 'wrap',
+              flexWrap: "wrap",
             }}
           >
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', color: 'var(--v-muted)', letterSpacing: '.05em' }}>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  color: "var(--v-muted)",
+                  letterSpacing: ".05em",
+                }}
+              >
                 Your Anonymous Reference ID
               </div>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#5A4E33', letterSpacing: '.04em' }}>
+              <div
+                style={{ fontSize: 18, fontWeight: 800, color: "#5A4E33", letterSpacing: ".04em" }}
+              >
                 {refId}
               </div>
             </div>
@@ -130,28 +141,28 @@ function PostIntakeConfirmationPage() {
               type="button"
               className="btn"
               style={{
-                background: copied ? 'var(--v-sys-bubble)' : '#fff',
-                border: '1px solid var(--v-border)',
-                color: '#26362A',
-                padding: '8px 14px',
+                background: copied ? "var(--v-sys-bubble)" : "#fff",
+                border: "1px solid var(--v-border)",
+                color: "#26362A",
+                padding: "8px 14px",
                 fontSize: 12.5,
               }}
               onClick={handleCopy}
             >
-              {copied ? '✓ Copied' : '📋 Copy ID'}
+              {copied ? "✓ Copied" : "📋 Copy ID"}
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
             <button
               type="button"
               style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--v-muted)',
+                background: "none",
+                border: "none",
+                color: "var(--v-muted)",
                 fontSize: 12,
-                cursor: 'pointer',
-                textDecoration: 'underline',
+                cursor: "pointer",
+                textDecoration: "underline",
               }}
               onClick={() => setShowSmsBox(!showSmsBox)}
             >
@@ -161,12 +172,12 @@ function PostIntakeConfirmationPage() {
             <button
               type="button"
               style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--a-critical)',
+                background: "none",
+                border: "none",
+                color: "var(--a-critical)",
                 fontSize: 12,
-                cursor: 'pointer',
-                textDecoration: 'underline',
+                cursor: "pointer",
+                textDecoration: "underline",
               }}
               onClick={handleClearSession}
             >
@@ -175,10 +186,10 @@ function PostIntakeConfirmationPage() {
           </div>
 
           {showSmsBox && (
-            <form onSubmit={handleSendSms} style={{ marginBottom: 18, display: 'flex', gap: 8 }}>
+            <form onSubmit={handleSendSms} style={{ marginBottom: 18, display: "flex", gap: 8 }}>
               <input
                 className="chat-input"
-                style={{ flex: 1, padding: '8px 12px', fontSize: 13 }}
+                style={{ flex: 1, padding: "8px 12px", fontSize: 13 }}
                 type="tel"
                 placeholder="Enter 10-digit mobile number"
                 value={phoneInput}
@@ -188,23 +199,29 @@ function PostIntakeConfirmationPage() {
               <button
                 type="submit"
                 className="btn"
-                style={{ background: 'var(--v-sys-bubble)', color: '#26362A', padding: '8px 14px', fontSize: 12.5 }}
+                style={{
+                  background: "var(--v-sys-bubble)",
+                  color: "#26362A",
+                  padding: "8px 14px",
+                  fontSize: 12.5,
+                }}
               >
                 Send SMS
               </button>
             </form>
           )}
 
-          <p style={{ fontSize: 12.5, color: 'var(--v-muted)', margin: '0 0 20px' }}>
-            Save this ID to check your case status later. If you feel in immediate danger at any time, tap Emergency Help above.
+          <p style={{ fontSize: 12.5, color: "var(--v-muted)", margin: "0 0 20px" }}>
+            Save this ID to check your case status later. If you feel in immediate danger at any
+            time, tap Emergency Help above.
           </p>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <button
               type="button"
               className="btn btn-block"
-              style={{ background: 'var(--v-sys-bubble)', color: '#26362A' }}
-              onClick={() => navigate({ to: '/' })}
+              style={{ background: "var(--v-sys-bubble)", color: "#26362A" }}
+              onClick={() => navigate({ to: "/" })}
             >
               Done & Return Home
             </button>
@@ -213,10 +230,10 @@ function PostIntakeConfirmationPage() {
               to="/support/status"
               className="btn btn-block"
               style={{
-                background: 'transparent',
-                border: '1.5px solid var(--v-border)',
-                color: '#5A5343',
-                textAlign: 'center',
+                background: "transparent",
+                border: "1.5px solid var(--v-border)",
+                color: "#5A5343",
+                textAlign: "center",
               }}
             >
               Check case status
@@ -225,9 +242,7 @@ function PostIntakeConfirmationPage() {
         </div>
       </div>
 
-      {toastMessage && (
-        <Toast message={toastMessage} onDone={() => setToastMessage(null)} />
-      )}
+      {toastMessage && <Toast message={toastMessage} onDone={() => setToastMessage(null)} />}
     </VictimLayout>
   );
 }

@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { VictimLayout } from '@/components/trace/VictimLayout';
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { VictimLayout } from "@/components/trace/VictimLayout";
 
-export const Route = createFileRoute('/support/channel')({
+export const Route = createFileRoute("/support/channel")({
   component: ChannelSelectPage,
 });
 
@@ -15,7 +15,7 @@ function ChannelSelectPage() {
           <button
             type="button"
             className="v-back"
-            onClick={() => navigate({ to: '/support' })}
+            onClick={() => navigate({ to: "/support" })}
             aria-label="Back to consent screen"
           >
             ← Back
@@ -27,7 +27,7 @@ function ChannelSelectPage() {
             <button
               type="button"
               className="channel-btn"
-              onClick={() => navigate({ to: '/support/chat' })}
+              onClick={() => navigate({ to: "/support/chat" })}
             >
               <span className="ico" aria-hidden="true">
                 <svg
@@ -50,7 +50,7 @@ function ChannelSelectPage() {
             <button
               type="button"
               className="channel-btn"
-              onClick={() => navigate({ to: '/support/voice' })}
+              onClick={() => navigate({ to: "/support/voice" })}
             >
               <span className="ico" aria-hidden="true">
                 <svg
@@ -73,9 +73,9 @@ function ChannelSelectPage() {
             </button>
           </div>
 
-          <p style={{ fontSize: 12.5, color: 'var(--v-muted)', textAlign: 'center', margin: 0 }}>
-            You can also continue this conversation later through the NHAA IVRS line at{' '}
-            <a className="tel-link" href="tel:14566" style={{ color: 'var(--v-muted)' }}>
+          <p style={{ fontSize: 12.5, color: "var(--v-muted)", textAlign: "center", margin: 0 }}>
+            You can also continue this conversation later through the NHAA IVRS line at{" "}
+            <a className="tel-link" href="tel:14566" style={{ color: "var(--v-muted)" }}>
               14566
             </a>
           </p>

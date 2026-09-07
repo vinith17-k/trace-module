@@ -1,16 +1,16 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useAuthGuard } from '@/hooks/useAuthGuard';
-import { StaffLayout } from '@/components/trace/StaffLayout';
-import { BadgeRisk } from '@/components/trace/BadgeRisk';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { StaffLayout } from "@/components/trace/StaffLayout";
+import { BadgeRisk } from "@/components/trace/BadgeRisk";
 
-export const Route = createFileRoute('/staff/my-cases')({
+export const Route = createFileRoute("/staff/my-cases")({
   component: MyCasesPage,
 });
 
 const MY_CASES = [
-  { refId: 'NHAA-4F82-K91', risk: 'critical', lastContact: '4 min ago', status: 'In progress' },
-  { refId: 'NHAA-2C10-B44', risk: 'high', lastContact: '1 day ago', status: 'Follow-up scheduled' },
-  { refId: 'NHAA-6B21-P77', risk: 'moderate', lastContact: '3 days ago', status: 'Resolved' },
+  { refId: "NHAA-4F82-K91", risk: "critical", lastContact: "4 min ago", status: "In progress" },
+  { refId: "NHAA-2C10-B44", risk: "high", lastContact: "1 day ago", status: "Follow-up scheduled" },
+  { refId: "NHAA-6B21-P77", risk: "moderate", lastContact: "3 days ago", status: "Resolved" },
 ];
 
 function MyCasesPage() {
@@ -43,15 +43,17 @@ function MyCasesPage() {
                 tabIndex={0}
                 role="button"
                 aria-label={`Open case ${c.refId}`}
-                onClick={() => navigate({ to: '/staff/case/$id', params: { id: c.refId } })}
+                onClick={() => navigate({ to: "/staff/case/$id", params: { id: c.refId } })}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    navigate({ to: '/staff/case/$id', params: { id: c.refId } });
+                    navigate({ to: "/staff/case/$id", params: { id: c.refId } });
                   }
                 }}
               >
-                <td><b>{c.refId}</b></td>
+                <td>
+                  <b>{c.refId}</b>
+                </td>
                 <td>
                   <BadgeRisk level={c.risk} />
                 </td>

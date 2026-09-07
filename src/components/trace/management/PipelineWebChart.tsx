@@ -491,7 +491,7 @@ export const PipelineWebChart: React.FC<PipelineWebChartProps> = ({ onNotify }) 
       </div>
 
       {/* Main Interactive Topology Area */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: 20 }}>
+      <div className="pipeline-chart-layout">
         {/* Left: Web Chart Network */}
         <div className="web-chart-wrap" style={{ position: 'relative' }}>
           {/* Subtle connection guidance watermark */}

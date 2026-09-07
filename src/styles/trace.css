@@ -1479,6 +1479,31 @@ button:disabled,
   color: var(--a-accent);
 }
 
+/* Pipeline chart responsive two-column layout */
+.pipeline-chart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .pipeline-chart-layout {
+    grid-template-columns: 1fr;
+  }
+  .pipeline-chart-layout > :nth-child(2) {
+    max-height: 500px;
+  }
+}
+@media (max-width: 768px) {
+  .web-chart-layers {
+    min-width: 600px;
+  }
+  .web-chart-wrap {
+    min-height: 320px;
+    padding: 14px;
+  }
+}
+
 /* Web Chart Node Network */
 .web-chart-wrap {
   position: relative;

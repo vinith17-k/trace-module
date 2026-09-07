@@ -78,6 +78,7 @@ export type Database = {
       }
       interactions: {
         Row: {
+          anonymized_ref_hash: string | null
           anonymized_ref_id: string
           audio_url: string | null
           channel: Database["public"]["Enums"]["channel_type"]
@@ -88,10 +89,15 @@ export type Database = {
           deleted_at: string | null
           id: string
           identity_ref: string | null
+          idempotency_key: string | null
           language_code: string
+          last_error: string | null
+          pipeline_attempts: number
+          pipeline_status: string
           raw_text: string | null
         }
         Insert: {
+          anonymized_ref_hash?: string | null
           anonymized_ref_id?: string
           audio_url?: string | null
           channel: Database["public"]["Enums"]["channel_type"]
@@ -102,10 +108,15 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           identity_ref?: string | null
+          idempotency_key?: string | null
           language_code?: string
+          last_error?: string | null
+          pipeline_attempts?: number
+          pipeline_status?: string
           raw_text?: string | null
         }
         Update: {
+          anonymized_ref_hash?: string | null
           anonymized_ref_id?: string
           audio_url?: string | null
           channel?: Database["public"]["Enums"]["channel_type"]
@@ -116,7 +127,11 @@ export type Database = {
           deleted_at?: string | null
           id?: string
           identity_ref?: string | null
+          idempotency_key?: string | null
           language_code?: string
+          last_error?: string | null
+          pipeline_attempts?: number
+          pipeline_status?: string
           raw_text?: string | null
         }
         Relationships: [
@@ -133,27 +148,39 @@ export type Database = {
         Row: {
           channel: string
           created_at: string
+          error_message: string | null
           id: string
+          next_retry_at: string | null
           payload: Json
           recommendation_id: string | null
+          retry_count: number
+          sent_at: string | null
           status: string
           target: string | null
         }
         Insert: {
           channel?: string
           created_at?: string
+          error_message?: string | null
           id?: string
+          next_retry_at?: string | null
           payload?: Json
           recommendation_id?: string | null
+          retry_count?: number
+          sent_at?: string | null
           status?: string
           target?: string | null
         }
         Update: {
           channel?: string
           created_at?: string
+          error_message?: string | null
           id?: string
+          next_retry_at?: string | null
           payload?: Json
           recommendation_id?: string | null
+          retry_count?: number
+          sent_at?: string | null
           status?: string
           target?: string | null
         }
@@ -274,20 +301,111 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_outcomes: {
+        Row: {
+          actual_outcome: string
+          created_at: string
+          id: string
+          initial_risk_category: Database["public"]["Enums"]["risk_category"]
+          notes: string | null
+          outcome_status: string
+          reviewer_id: string | null
+          svi_assessment_id: string
+        }
+        Insert: {
+          actual_outcome: string
+          created_at?: string
+          id?: string
+          initial_risk_category: Database["public"]["Enums"]["risk_category"]
+          notes?: string | null
+          outcome_status: string
+          reviewer_id?: string | null
+          svi_assessment_id: string
+        }
+        Update: {
+          actual_outcome?: string
+          created_at?: string
+          id?: string
+          initial_risk_category?: Database["public"]["Enums"]["risk_category"]
+          notes?: string | null
+          outcome_status?: string
+          reviewer_id?: string | null
+          svi_assessment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assessment_outcomes_svi_assessment_id_fkey"
+            columns: ["svi_assessment_id"]
+            isOneToOne: false
+            referencedRelation: "svi_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pipeline_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          interaction_id: string
+          model_name: string | null
+          started_at: string
+          status: string
+          tokens_used: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          interaction_id: string
+          model_name?: string | null
+          started_at?: string
+          status: string
+          tokens_used?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          interaction_id?: string
+          model_name?: string | null
+          started_at?: string
+          status?: string
+          tokens_used?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pipeline_runs_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "interactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       risk_thresholds: {
         Row: {
+          config_version: number
           id: string
           max_score: number
           min_score: number
           risk_category: Database["public"]["Enums"]["risk_category"]
         }
         Insert: {
+          config_version?: number
           id?: string
           max_score: number
           min_score: number
           risk_category: Database["public"]["Enums"]["risk_category"]
         }
         Update: {
+          config_version?: number
           id?: string
           max_score?: number
           min_score?: number
@@ -303,6 +421,7 @@ export type Database = {
           id: string
           interaction_id: string
           language_code: string | null
+          model_version: string
           numeric_value: number | null
           signal_type: Database["public"]["Enums"]["signal_type"]
           value: Json
@@ -314,6 +433,7 @@ export type Database = {
           id?: string
           interaction_id: string
           language_code?: string | null
+          model_version?: string
           numeric_value?: number | null
           signal_type: Database["public"]["Enums"]["signal_type"]
           value?: Json
@@ -325,6 +445,7 @@ export type Database = {
           id?: string
           interaction_id?: string
           language_code?: string | null
+          model_version?: string
           numeric_value?: number | null
           signal_type?: Database["public"]["Enums"]["signal_type"]
           value?: Json
@@ -342,30 +463,36 @@ export type Database = {
       svi_assessments: {
         Row: {
           computed_at: string
+          config_version: string
           deleted_at: string | null
           id: string
           interaction_id: string
           model_version: string
+          partial: boolean
           risk_category: Database["public"]["Enums"]["risk_category"]
           svi_score: number
           trauma_indicators: Json
         }
         Insert: {
           computed_at?: string
+          config_version?: string
           deleted_at?: string | null
           id?: string
           interaction_id: string
           model_version?: string
+          partial?: boolean
           risk_category: Database["public"]["Enums"]["risk_category"]
           svi_score: number
           trauma_indicators?: Json
         }
         Update: {
           computed_at?: string
+          config_version?: string
           deleted_at?: string | null
           id?: string
           interaction_id?: string
           model_version?: string
+          partial?: boolean
           risk_category?: Database["public"]["Enums"]["risk_category"]
           svi_score?: number
           trauma_indicators?: Json
@@ -383,6 +510,7 @@ export type Database = {
       svi_weights: {
         Row: {
           active: boolean
+          config_version: number
           id: string
           max_contribution: number
           notes: string | null
@@ -392,6 +520,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          config_version?: number
           id?: string
           max_contribution?: number
           notes?: string | null
@@ -401,6 +530,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          config_version?: number
           id?: string
           max_contribution?: number
           notes?: string | null

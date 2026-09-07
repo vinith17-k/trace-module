@@ -11,6 +11,7 @@
 import { getAcousticProvider, getAsrProvider } from "./providers.server";
 
 export const MODEL_VERSION = "trace-svi-v1";
+export const LLM_MODEL_NAME = "google/gemini-3.7-flash";
 
 /** Data-driven language support: codes are only used as data, never branched on. */
 export const SUPPORTED_LANGUAGES = [
@@ -44,12 +45,21 @@ async function admin(): Promise<Admin> {
 }
 
 /* ------------------------------------------------------------------ */
-/* Lovable AI helper                                                    */
+/* Lovable AI helper with graceful failure handling                   */
 /* ------------------------------------------------------------------ */
+
+export interface LLMResponseWithMetadata {
+  data: unknown | null;
+  tokensUsed?: number;
+  error?: string;
+}
 
 async function callLLM(system: string, user: string): Promise<unknown | null> {
   const key = process.env["LOVABLE_API_KEY"];
-  if (!key) return null;
+  if (!key) {
+    console.warn("LOVABLE_API_KEY not set — falling back to deterministic keyword analysis");
+    return null;
+  }
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -58,7 +68,7 @@ async function callLLM(system: string, user: string): Promise<unknown | null> {
         Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        model: "google/gemini-3.7-flash",
+        model: LLM_MODEL_NAME,
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
@@ -106,7 +116,7 @@ export async function detectLanguage(text: string, hint?: string): Promise<strin
 }
 
 /* ------------------------------------------------------------------ */
-/* 2. analyze-text-signals                                              */
+/* 2. analyze-text-signals with LLM fallback                           */
 /* ------------------------------------------------------------------ */
 
 const EMOTION_SYSTEM_PROMPT = `You are a triage signal extractor for a victim support helpline.
@@ -122,6 +132,7 @@ export interface TextAnalysisResult {
   emotions: Record<EmotionKey, number>;
   keywordMatches: Array<{ phrase: string; indicator: string; severity: number }>;
   signalsWritten: number;
+  isPartial: boolean;
 }
 
 export async function analyzeTextSignals(params: {
@@ -133,17 +144,20 @@ export async function analyzeTextSignals(params: {
   const languageCode = await detectLanguage(params.rawText, params.languageCode);
   const lower = params.rawText.toLowerCase();
 
-  // --- Emotion / distress scoring via LLM -------------------------------
+  // --- Emotion / distress scoring via LLM with fallback ----------------
   const llm = (await callLLM(EMOTION_SYSTEM_PROMPT, params.rawText.slice(0, 6000))) as
     | (Partial<Record<EmotionKey, number>> & { confidence?: number; rationale_tags?: string[] })
     | null;
 
+  const isPartial = llm === null;
   const emotions = Object.fromEntries(
     EMOTION_KEYS.map((k) => [k, clamp01(llm?.[k] ?? 0)]),
   ) as Record<EmotionKey, number>;
-  const emotionConfidence = llm ? clamp01(llm.confidence ?? 0.7) : 0;
 
-  // --- Lexicon keyword flags -------------------------------------------
+  // If LLM failed, confidence is 0.0, else from LLM or default 0.7
+  const emotionConfidence = isPartial ? 0.0 : clamp01(llm?.confidence ?? 0.7);
+
+  // --- Lexicon keyword flags (always executed, reliable fallback) -------
   const { data: lexicon } = await db
     .from("risk_lexicon")
     .select("phrase, indicator, severity, language_code")
@@ -168,16 +182,18 @@ export async function analyzeTextSignals(params: {
     numeric_value: number;
     confidence: number;
     language_code: string;
+    model_version: string;
   }> = [];
 
   for (const key of EMOTION_KEYS) {
     rows.push({
       interaction_id: params.interactionId,
       signal_type: "sentiment",
-      value: { key, tags: llm?.rationale_tags ?? [] },
+      value: { key, tags: llm?.rationale_tags ?? (isPartial ? ["llm_fallback"] : []) },
       numeric_value: emotions[key],
       confidence: emotionConfidence,
       language_code: languageCode,
+      model_version: isPartial ? "fallback:keyword_only" : LLM_MODEL_NAME,
     });
   }
 
@@ -189,6 +205,7 @@ export async function analyzeTextSignals(params: {
       numeric_value: clamp01(match.severity),
       confidence: 0.95,
       language_code: languageCode,
+      model_version: "risk_lexicon:v1",
     });
   }
 
@@ -201,6 +218,7 @@ export async function analyzeTextSignals(params: {
     numeric_value: clamp01((keywordMatches.length * 10) / words),
     confidence: 0.6,
     language_code: languageCode,
+    model_version: "lexical_density:v1",
   });
 
   const { error } = await db.from("stress_signals").insert(rows as never);
@@ -217,6 +235,7 @@ export async function analyzeTextSignals(params: {
     emotions,
     keywordMatches,
     signalsWritten: rows.length,
+    isPartial,
   };
 }
 
@@ -231,6 +250,7 @@ export interface VoiceAnalysisResult {
   acoustic: { pitchVariance: number; pauseFrequency: number; speechRateDeviation: number };
   signalsWritten: number;
   textAnalysis: TextAnalysisResult | null;
+  isPartial: boolean;
 }
 
 export async function analyzeVoiceSignals(params: {
@@ -253,6 +273,7 @@ export async function analyzeVoiceSignals(params: {
       numeric_value: clamp01(acoustic.pitchVariance),
       confidence: clamp01(acoustic.confidence),
       language_code: transcription.languageCode,
+      model_version: "acoustic_pitch:v1",
     },
     {
       interaction_id: params.interactionId,
@@ -261,6 +282,7 @@ export async function analyzeVoiceSignals(params: {
       numeric_value: clamp01(acoustic.pauseFrequency),
       confidence: clamp01(acoustic.confidence),
       language_code: transcription.languageCode,
+      model_version: "acoustic_pause:v1",
     },
     {
       interaction_id: params.interactionId,
@@ -269,14 +291,14 @@ export async function analyzeVoiceSignals(params: {
       numeric_value: clamp01(acoustic.speechRateDeviation),
       confidence: clamp01(acoustic.confidence),
       language_code: transcription.languageCode,
+      model_version: "speech_rate:v1",
     },
   ];
 
   const { error } = await db.from("stress_signals").insert(rows as never);
   if (error) throw new Error(`stress_signals insert failed: ${error.message}`);
 
-  // Store the transcript on the interaction (readable only by analysis code
-  // and admin/counsellor roles per RLS) and run the text pipeline on it.
+  // Store the transcript on the interaction and run the text pipeline on it.
   await db
     .from("interactions")
     .update({ raw_text: transcription.text, language_code: transcription.languageCode })
@@ -299,6 +321,7 @@ export async function analyzeVoiceSignals(params: {
     },
     signalsWritten: rows.length + textAnalysis.signalsWritten,
     textAnalysis,
+    isPartial: textAnalysis.isPartial,
   };
 }
 
@@ -313,32 +336,42 @@ export interface SviResult {
   riskCategory: "low" | "moderate" | "high" | "critical";
   traumaIndicators: string[];
   breakdown: Array<{ signal_type: string; key: string; contribution: number }>;
+  partial: boolean;
+  configVersion: string;
 }
 
 /** Threshold above which an emotional cue is reported as a trauma indicator. */
 const INDICATOR_THRESHOLD = 0.4;
 
-export async function computeSvi(interactionId: string): Promise<SviResult> {
+export async function computeSvi(
+  interactionId: string,
+  isPartial = false,
+): Promise<SviResult> {
   const db = await admin();
 
   const [{ data: signals }, { data: weights }, { data: thresholds }] = await Promise.all([
     db
       .from("stress_signals")
-      .select("signal_type, value, numeric_value, confidence")
+      .select("signal_type, value, numeric_value, confidence, model_version")
       .eq("interaction_id", interactionId)
       .is("deleted_at", null),
-    db.from("svi_weights").select("signal_type, signal_key, weight, max_contribution").eq("active", true),
-    db.from("risk_thresholds").select("risk_category, min_score, max_score"),
+    db.from("svi_weights").select("signal_type, signal_key, weight, max_contribution, config_version").eq("active", true),
+    db.from("risk_thresholds").select("risk_category, min_score, max_score, config_version"),
   ]);
 
   if (!signals || signals.length === 0) {
     throw new Error("No stress signals found for this interaction");
   }
 
-  // Weighted-scoring formula (fully editable in svi_weights):
-  //   contribution(signal) = normalised_value * confidence_floor * weight
-  //   contribution per (signal_type, key) is capped at max_contribution
-  //   svi_score = min(100, sum of all capped contributions)
+  // Derive active configuration version stamp
+  const weightVersion = weights?.[0]?.config_version ?? 1;
+  const threshVersion = thresholds?.[0]?.config_version ?? 1;
+  const configVersion = `weights-v${weightVersion}:thresh-v${threshVersion}`;
+
+  // Check if any sentiment signal was produced by fallback
+  const hasFallbackSignal = signals.some((s) => s.model_version?.includes("fallback"));
+  const finalPartial = isPartial || hasFallbackSignal;
+
   const buckets = new Map<string, { signal_type: string; key: string; sum: number }>();
   const indicatorSet = new Set<string>();
 
@@ -346,7 +379,6 @@ export async function computeSvi(interactionId: string): Promise<SviResult> {
     const value = (s.value ?? {}) as Record<string, unknown>;
     const key = typeof value["key"] === "string" ? (value["key"] as string) : "default";
     const normalised = clamp01(s.numeric_value ?? 0);
-    // Confidence damps low-confidence providers but never fully zeroes a signal.
     const confidenceFactor = 0.5 + 0.5 * clamp01(s.confidence ?? 0.5);
     const weightRow =
       weights?.find((w) => w.signal_type === s.signal_type && w.signal_key === key) ??
@@ -389,6 +421,8 @@ export async function computeSvi(interactionId: string): Promise<SviResult> {
       risk_category: riskCategory,
       trauma_indicators: traumaIndicators,
       model_version: MODEL_VERSION,
+      partial: finalPartial,
+      config_version: configVersion,
     })
     .select("id")
     .single();
@@ -402,6 +436,8 @@ export async function computeSvi(interactionId: string): Promise<SviResult> {
     riskCategory,
     traumaIndicators,
     breakdown,
+    partial: finalPartial,
+    configVersion,
   };
 }
 
@@ -427,6 +463,7 @@ export async function generateRecommendation(
     .from("svi_assessments")
     .select("id, risk_category, trauma_indicators, interaction_id")
     .eq("id", sviAssessmentId)
+    .is("deleted_at", null)
     .single();
   if (aErr || !assessment) throw new Error("Assessment not found");
 
@@ -506,10 +543,10 @@ export async function notifyAuthority(recommendationId: string): Promise<{ outbo
     .from("recommendations")
     .select("id, action_type, priority, assigned_authority, svi_assessment_id")
     .eq("id", recommendationId)
+    .is("deleted_at", null)
     .single();
   if (error || !rec) throw new Error("Recommendation not found");
 
-  // Payload deliberately contains NO PII and no raw text/transcript.
   const payload = {
     recommendation_id: rec.id,
     action_type: rec.action_type,
@@ -518,8 +555,6 @@ export async function notifyAuthority(recommendationId: string): Promise<{ outbo
     dispatched_by: "trace-notify-authority",
   };
 
-  // TODO: plug in a real SMS / email / webhook provider here and set
-  // status = 'sent' | 'failed' based on the provider response.
   const { data: outbox, error: oErr } = await db
     .from("notification_outbox")
     .insert({
@@ -528,6 +563,7 @@ export async function notifyAuthority(recommendationId: string): Promise<{ outbo
       target: rec.assigned_authority,
       payload,
       status: "queued",
+      retry_count: 0,
     })
     .select("id")
     .single();
@@ -546,4 +582,180 @@ export async function notifyAuthority(recommendationId: string): Promise<{ outbo
   });
 
   return { outboxId: outbox.id };
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. End-to-End Pipeline Runner & Re-run (with Telemetry)             */
+/* ------------------------------------------------------------------ */
+
+export interface FullPipelineResult {
+  interactionId: string;
+  svi: SviResult;
+  recommendation: RecommendationResult;
+  isPartial: boolean;
+  durationMs: number;
+}
+
+/**
+ * Executes the entire TRACE analysis pipeline for an interaction with
+ * telemetry logging into pipeline_runs and status updating on interactions.
+ */
+export async function runFullPipeline(
+  interactionId: string,
+  options?: { isRerun?: boolean },
+): Promise<FullPipelineResult> {
+  const db = await admin();
+  const startTime = Date.now();
+
+  const { data: interaction, error: iErr } = await db
+    .from("interactions")
+    .select("id, channel, raw_text, audio_url, language_code, consent_given, pipeline_attempts")
+    .eq("id", interactionId)
+    .is("deleted_at", null)
+    .single();
+
+  if (iErr || !interaction) {
+    throw new Error(`Interaction ${interactionId} not found or deleted`);
+  }
+
+  if (!interaction.consent_given) {
+    throw new Error("Consent not given; cannot run analysis pipeline");
+  }
+
+  // Update interaction to 'analyzing' and increment attempts
+  const currentAttempts = (interaction.pipeline_attempts ?? 0) + 1;
+  await db
+    .from("interactions")
+    .update({
+      pipeline_status: "analyzing",
+      pipeline_attempts: currentAttempts,
+      last_error: null,
+    })
+    .eq("id", interactionId);
+
+  // Insert initial telemetry run record
+  let runId: string | undefined;
+  try {
+    const { data: runRecord } = await db
+      .from("pipeline_runs")
+      .insert({
+        interaction_id: interactionId,
+        started_at: new Date().toISOString(),
+        model_name: LLM_MODEL_NAME,
+        status: "started",
+      })
+      .select("id")
+      .single();
+    runId = runRecord?.id;
+  } catch {
+    // Gracefully continue if pipeline_runs table is optional or logging fails
+  }
+
+  try {
+    let isPartial = false;
+    if (interaction.audio_url) {
+      const voiceResult = await analyzeVoiceSignals({
+        interactionId,
+        audioUrl: interaction.audio_url,
+        languageCode: interaction.language_code,
+      });
+      isPartial = voiceResult.isPartial;
+    } else if (interaction.raw_text) {
+      const textResult = await analyzeTextSignals({
+        interactionId,
+        rawText: interaction.raw_text,
+        languageCode: interaction.language_code,
+      });
+      isPartial = textResult.isPartial;
+    } else {
+      throw new Error("No raw text or audio available for analysis");
+    }
+
+    const svi = await computeSvi(interactionId, isPartial);
+    const recommendation = await generateRecommendation(svi.assessmentId);
+
+    const durationMs = Date.now() - startTime;
+    const finalStatus = isPartial ? "partial" : "complete";
+
+    // Mark interaction complete or partial
+    await db
+      .from("interactions")
+      .update({
+        pipeline_status: finalStatus,
+        last_error: null,
+      })
+      .eq("id", interactionId);
+
+    // Update telemetry run
+    if (runId) {
+      await db
+        .from("pipeline_runs")
+        .update({
+          completed_at: new Date().toISOString(),
+          duration_ms: durationMs,
+          status: isPartial ? "partial" : "success",
+        })
+        .eq("id", runId);
+    }
+
+    return {
+      interactionId,
+      svi,
+      recommendation,
+      isPartial,
+      durationMs,
+    };
+  } catch (err) {
+    const durationMs = Date.now() - startTime;
+    const errorMsg = err instanceof Error ? err.message : String(err);
+
+    // Update interaction status to failed
+    await db
+      .from("interactions")
+      .update({
+        pipeline_status: "failed",
+        last_error: errorMsg,
+      })
+      .eq("id", interactionId);
+
+    // Update telemetry run with error
+    if (runId) {
+      await db
+        .from("pipeline_runs")
+        .update({
+          completed_at: new Date().toISOString(),
+          duration_ms: durationMs,
+          status: "failed",
+          error_message: errorMsg,
+        })
+        .eq("id", runId);
+    }
+
+    throw err;
+  }
+}
+
+/**
+ * Re-runs the pipeline for an interaction, soft-deleting any previous
+ * signals and assessments to guarantee clean re-assessment.
+ */
+export async function rerunPipeline(interactionId: string): Promise<FullPipelineResult> {
+  const db = await admin();
+  const now = new Date().toISOString();
+
+  // Soft-delete previous signals and assessments
+  await Promise.all([
+    db
+      .from("stress_signals")
+      .update({ deleted_at: now })
+      .eq("interaction_id", interactionId)
+      .is("deleted_at", null),
+    db
+      .from("svi_assessments")
+      .update({ deleted_at: now })
+      .eq("interaction_id", interactionId)
+      .is("deleted_at", null),
+  ]);
+
+  return runFullPipeline(interactionId, { isRerun: true });
 }

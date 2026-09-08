@@ -357,12 +357,30 @@ export function SignalRadarMap({ activeCaseId = "NHAA-4F82-K91" }: SignalRadarMa
 
       leafletMapRef.current = map;
 
-      // Dark Matter Carto basemap
-      const tileUrl = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-      L.tileLayer(tileUrl, {
-        subdomains: "abcd",
-        maxZoom: 19,
-      }).addTo(map);
+      // Watermark-free Dark Canvas: Esri World Dark Gray (No API key required) or Authenticated Carto
+      const cartoKey = (import.meta as any).env?.VITE_CARTO_API_KEY;
+      if (cartoKey) {
+        L.tileLayer(`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${cartoKey}`, {
+          subdomains: "abcd",
+          maxZoom: 19,
+        }).addTo(map);
+      } else {
+        // Zero-configuration, clean dark basemap with NO watermark and NO API key required
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+          {
+            maxZoom: 16,
+          }
+        ).addTo(map);
+
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}",
+          {
+            maxZoom: 16,
+            pane: "overlayPane",
+          }
+        ).addTo(map);
+      }
 
       // Initialize layer groups
       layerGroupsRef.current = {

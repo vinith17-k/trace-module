@@ -788,7 +788,12 @@ export const RoadmapTimeline: React.FC<RoadmapTimelineProps> = ({ onNotify }) =>
                 <select
                   className="search-box"
                   value={selectedMilestone.status}
-                  onChange={(e) => handleUpdateMilestone("status", e.target.value)}
+                  onChange={(e) =>
+                    handleUpdateMilestone(
+                      "status",
+                      e.target.value as (typeof selectedMilestone)["status"],
+                    )
+                  }
                   style={{ height: 32, fontSize: 12, width: "auto" }}
                 >
                   <option value="not_started">Not Started</option>

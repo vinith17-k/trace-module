@@ -430,17 +430,7 @@ function CaseDetailPage() {
       </div>
 
       {/* Live Geographical Signal Radar & Proximity Triage Map */}
-      <div
-        className="panel"
-        style={{
-          marginTop: 24,
-          padding: "24px 28px",
-          background: "#0a0e14",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
-          borderRadius: 18,
-          boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
-        }}
-      >
+      <div className="panel" style={{ marginTop: 20 }}>
         <SignalRadarMap activeCaseId={caseId} isEmbedded />
       </div>
 

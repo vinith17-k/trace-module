@@ -13,7 +13,6 @@ export function PrototypeNavigator() {
       group: "Public / Marketing",
       items: [
         { label: "1. Home / Landing", to: "/" },
-        { label: "⚡ Live Signal Radar Map", to: "/map" },
         { label: "2. About & How it Works", to: "/about" },
         { label: "3. Privacy Policy", to: "/privacy" },
         { label: "4. Terms of Service", to: "/terms" },

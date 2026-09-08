@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import {
   Shield,
   MapPin,
@@ -17,8 +16,7 @@ import {
   Eye,
   Activity,
   Layers,
-  Sparkles,
-  Maximize2,
+  Navigation,
 } from "lucide-react";
 import type { Map as LeafletMap, LayerGroup } from "leaflet";
 
@@ -71,74 +69,58 @@ export interface DispatchUnit {
   assignedCase?: string;
 }
 
-export interface CitizenReport {
-  id: string;
-  lat: number;
-  lng: number;
-  address: string;
-  type: "Distress Call" | "Acoustic Panic" | "Domestic Disturbance" | "SOS Beacon";
-  confidence: number;
-  timeAgo: string;
-}
-
-export const REGIONS: Record<
+const REGIONS: Record<
   string,
   { label: string; name: string; center: [number, number]; zoom: number }
 > = {
   delhi: {
     label: "Delhi NCR",
     name: "DELHI NATIONAL CAPITAL REGION",
-    center: [28.6139, 77.209],
-    zoom: 12,
+    center: [28.6289, 77.2185],
+    zoom: 13,
   },
   mumbai: {
     label: "Mumbai Metro",
     name: "MUMBAI METROPOLITAN REGION",
-    center: [19.076, 72.8777],
-    zoom: 12,
+    center: [19.129, 72.8258],
+    zoom: 13,
   },
   bengaluru: {
     label: "Bengaluru Urban",
     name: "BENGALURU URBAN REGION",
-    center: [12.9716, 77.5946],
-    zoom: 12,
+    center: [12.9784, 77.6408],
+    zoom: 13,
   },
   kolkata: {
     label: "Kolkata Hub",
     name: "KOLKATA METROPOLITAN AREA",
-    center: [22.5726, 88.3639],
-    zoom: 12,
+    center: [22.5804, 88.4378],
+    zoom: 13,
   },
   hyderabad: {
     label: "Hyderabad Metro",
     name: "HYDERABAD CYBERABAD ZONE",
-    center: [17.385, 78.4867],
-    zoom: 12,
-  },
-  national: {
-    label: "National View (All India)",
-    name: "ALL INDIA CRISIS COMMAND RADAR",
-    center: [22.5937, 78.9629],
-    zoom: 5,
+    center: [17.44, 78.3489],
+    zoom: 13,
   },
 };
 
-export const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
+const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
   delhi: [
     {
       id: "inc-1",
       refId: "NHAA-4F82-K91",
-      title: "Connaught Place South Block",
+      title: "Connaught Place South Block (Active Case)",
       lat: 28.6289,
       lng: 77.2185,
       svi: 88,
       riskTier: "CRITICAL",
       category: "Immediate Danger",
-      signals: ["Weapons mentioned", "Direct threat to life", "Voice trembling / high pitch-shift"],
+      signals: ["Weapons mentioned", "Direct threat to life", "Voice pitch shift + high arousal"],
       nearestShelter: "Sakhi OSCC Lady Hardinge",
       eta: "4 mins",
       dispatched: true,
-      timestamp: "2 mins ago",
+      timestamp: "Active Call",
     },
     {
       id: "inc-2",
@@ -149,7 +131,7 @@ export const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
       svi: 76,
       riskTier: "CRITICAL",
       category: "Physical Violence",
-      signals: ["Barricaded room", "Audible background shouting", "Child present"],
+      signals: ["Barricaded room", "Audible shouting"],
       nearestShelter: "New Delhi Family Support Center",
       eta: "7 mins",
       dispatched: false,
@@ -164,41 +146,11 @@ export const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
       svi: 64,
       riskTier: "HIGH",
       category: "Intimate Partner Threat",
-      signals: ["Digital stalking", "Financial extortion", "Severe emotional distress"],
+      signals: ["Digital stalking", "Financial extortion"],
       nearestShelter: "Noida District Shelter Home",
       eta: "11 mins",
       dispatched: false,
       timestamp: "12 mins ago",
-    },
-    {
-      id: "inc-4",
-      refId: "NHAA-9E33-L78",
-      title: "Dwarka Sector 10",
-      lat: 28.581,
-      lng: 77.0601,
-      svi: 42,
-      riskTier: "ELEVATED",
-      category: "Severe Distress",
-      signals: ["Depression indicators", "Prolonged isolation", "Needs counselling support"],
-      nearestShelter: "West Delhi Community Haven",
-      eta: "15 mins",
-      dispatched: false,
-      timestamp: "24 mins ago",
-    },
-    {
-      id: "inc-5",
-      refId: "NHAA-3B77-Q05",
-      title: "Rohini Sector 14",
-      lat: 28.7183,
-      lng: 77.1265,
-      svi: 22,
-      riskTier: "ROUTINE",
-      category: "Post-Trauma Shock",
-      signals: ["Follow-up scheduled", "Safe with relative", "Legal guidance requested"],
-      nearestShelter: "North Delhi Legal Aid Cell",
-      eta: "20 mins",
-      dispatched: false,
-      timestamp: "38 mins ago",
     },
   ],
   mumbai: [
@@ -211,26 +163,11 @@ export const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
       svi: 84,
       riskTier: "CRITICAL",
       category: "Immediate Danger",
-      signals: ["Emergency door lock", "Physical aggression", "Voice biomarker high arousal"],
+      signals: ["Emergency door lock", "Physical aggression"],
       nearestShelter: "Cooper Hospital OSCC Wing",
       eta: "6 mins",
       dispatched: true,
       timestamp: "3 mins ago",
-    },
-    {
-      id: "inc-m2",
-      refId: "NHAA-7M42-B99",
-      title: "Dadar TT Circle",
-      lat: 19.0178,
-      lng: 72.8478,
-      svi: 58,
-      riskTier: "HIGH",
-      category: "Intimate Partner Threat",
-      signals: ["Threat of eviction", "Custody coercion"],
-      nearestShelter: "KEM Hospital Crisis Cell",
-      eta: "8 mins",
-      dispatched: false,
-      timestamp: "18 mins ago",
     },
   ],
   bengaluru: [
@@ -243,111 +180,22 @@ export const INITIAL_INCIDENTS: Record<string, SignalIncident[]> = {
       svi: 91,
       riskTier: "CRITICAL",
       category: "Immediate Danger",
-      signals: ["Physical assault in progress", "Caller whispering in closet", "Rapid breathing rate"],
+      signals: ["Physical assault in progress"],
       nearestShelter: "Bowring OSCC Shelter",
       eta: "5 mins",
       dispatched: true,
       timestamp: "1 min ago",
     },
   ],
-  kolkata: [
-    {
-      id: "inc-k1",
-      refId: "NHAA-6K30-W18",
-      title: "Salt Lake Sector V",
-      lat: 22.5804,
-      lng: 88.4378,
-      svi: 72,
-      riskTier: "HIGH",
-      category: "Severe Distress",
-      signals: ["Workplace harassment escalation", "High panic score"],
-      nearestShelter: "Bidhannagar OSCC Center",
-      eta: "9 mins",
-      dispatched: false,
-      timestamp: "14 mins ago",
-    },
-  ],
-  hyderabad: [
-    {
-      id: "inc-h1",
-      refId: "NHAA-3H88-K50",
-      title: "Gachibowli Financial District",
-      lat: 17.44,
-      lng: 78.3489,
-      svi: 80,
-      riskTier: "CRITICAL",
-      category: "Immediate Danger",
-      signals: ["Repeated physical stalking", "Aggressor at premise"],
-      nearestShelter: "Cyberabad Bharosa Center",
-      eta: "5 mins",
-      dispatched: true,
-      timestamp: "4 mins ago",
-    },
-  ],
-  national: [],
-};
-
-export const INITIAL_HOTSPOTS: Record<string, HotspotCluster[]> = {
-  delhi: [
-    {
-      id: "hs-1",
-      name: "Central Delhi Corridor (CP - Karol Bagh)",
-      lat: 28.638,
-      lng: 77.205,
-      incidentCount: 14,
-      severity: "CRITICAL",
-      dominantSignal: "Physical & Verbal Threats (SVI Avg: 82)",
-      recommendedAction: "Pre-position Mobile CAD Units & Activate Sakhi Fast-Track Response",
-      dispatchedUnits: 3,
-    },
-    {
-      id: "hs-2",
-      name: "East Trans-Yamuna Zone",
-      lat: 28.632,
-      lng: 77.301,
-      incidentCount: 8,
-      severity: "HIGH",
-      dominantSignal: "Domestic Coercion & Isolation",
-      recommendedAction: "Assign 2 dedicated vernacular Telugu/Hindi counsellors",
-      dispatchedUnits: 1,
-    },
-  ],
-  mumbai: [
-    {
-      id: "hs-m1",
-      name: "Western Suburbs Coastal Belt",
-      lat: 19.115,
-      lng: 72.83,
-      incidentCount: 11,
-      severity: "CRITICAL",
-      dominantSignal: "Severe Trauma & High Acoustic Distress",
-      recommendedAction: "Alert Nirbhaya Mobile Van Unit 4",
-      dispatchedUnits: 2,
-    },
-  ],
-  bengaluru: [
-    {
-      id: "hs-b1",
-      name: "East Tech Corridor (Whitefield / Indiranagar)",
-      lat: 12.975,
-      lng: 77.65,
-      incidentCount: 9,
-      severity: "HIGH",
-      dominantSignal: "Immediate Threat & Stalking Intakes",
-      recommendedAction: "Coordinate with Parihar Family Counselling Cell",
-      dispatchedUnits: 2,
-    },
-  ],
   kolkata: [],
   hyderabad: [],
-  national: [],
 };
 
-export const INITIAL_SHELTERS: Record<string, ShelterResource[]> = {
+const INITIAL_SHELTERS: Record<string, ShelterResource[]> = {
   delhi: [
     {
       id: "sh-1",
-      name: "Sakhi One-Stop Center — Lady Hardinge",
+      name: "Sakhi OSCC — Lady Hardinge Medical Center",
       type: "One-Stop Crisis Center (OSCC)",
       lat: 28.634,
       lng: 77.214,
@@ -357,7 +205,7 @@ export const INITIAL_SHELTERS: Record<string, ShelterResource[]> = {
     },
     {
       id: "sh-2",
-      name: "Delhi Government Women Safe Haven",
+      name: "Delhi Govt Safe Haven",
       type: "Women Safe House",
       lat: 28.665,
       lng: 77.185,
@@ -371,7 +219,7 @@ export const INITIAL_SHELTERS: Record<string, ShelterResource[]> = {
       type: "Emergency Medical Care",
       lat: 28.5672,
       lng: 77.21,
-      capacity: "Full Acute Trauma & Psychological Unit",
+      capacity: "Full Acute Trauma Unit",
       availableBeds: 18,
       helpline: "011-26588500",
     },
@@ -388,24 +236,12 @@ export const INITIAL_SHELTERS: Record<string, ShelterResource[]> = {
       helpline: "022-24107000",
     },
   ],
-  bengaluru: [
-    {
-      id: "sh-b1",
-      name: "Vanitha Sahayavani (Parihar)",
-      type: "Trauma Recovery Hub",
-      lat: 12.973,
-      lng: 77.585,
-      capacity: "Emergency police & trauma counsellors",
-      availableBeds: 10,
-      helpline: "080-22943225",
-    },
-  ],
+  bengaluru: [],
   kolkata: [],
   hyderabad: [],
-  national: [],
 };
 
-export const INITIAL_DISPATCH: Record<string, DispatchUnit[]> = {
+const INITIAL_DISPATCH: Record<string, DispatchUnit[]> = {
   delhi: [
     {
       id: "dsp-1",
@@ -424,14 +260,6 @@ export const INITIAL_DISPATCH: Record<string, DispatchUnit[]> = {
       lng: 77.195,
       status: "AVAILABLE",
     },
-    {
-      id: "dsp-3",
-      code: "WOMEN-RAPID-UNIT-9",
-      type: "Crisis Response Team",
-      lat: 28.61,
-      lng: 77.35,
-      status: "AVAILABLE",
-    },
   ],
   mumbai: [
     {
@@ -441,23 +269,31 @@ export const INITIAL_DISPATCH: Record<string, DispatchUnit[]> = {
       lat: 19.12,
       lng: 72.83,
       status: "EN_ROUTE",
-      assignedCase: "NHAA-5M11-A01",
     },
   ],
-  bengaluru: [
-    {
-      id: "dsp-b1",
-      code: "BLR-POLICE-PINK-14",
-      type: "CAD Police Unit",
-      lat: 12.98,
-      lng: 77.635,
-      status: "EN_ROUTE",
-      assignedCase: "NHAA-2B19-X02",
-    },
-  ],
+  bengaluru: [],
   kolkata: [],
   hyderabad: [],
-  national: [],
+};
+
+const INITIAL_HOTSPOTS: Record<string, HotspotCluster[]> = {
+  delhi: [
+    {
+      id: "hs-1",
+      name: "Central Delhi Corridor (CP - Karol Bagh)",
+      lat: 28.638,
+      lng: 77.205,
+      incidentCount: 14,
+      severity: "CRITICAL",
+      dominantSignal: "Physical & Verbal Threats (SVI Avg: 82)",
+      recommendedAction: "Pre-position Mobile CAD Units",
+      dispatchedUnits: 3,
+    },
+  ],
+  mumbai: [],
+  bengaluru: [],
+  kolkata: [],
+  hyderabad: [],
 };
 
 interface SignalRadarMapProps {
@@ -465,7 +301,7 @@ interface SignalRadarMapProps {
   isEmbedded?: boolean;
 }
 
-export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadarMapProps) {
+export function SignalRadarMap({ activeCaseId = "NHAA-4F82-K91" }: SignalRadarMapProps) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const leafletMapRef = useRef<LeafletMap | null>(null);
   const layerGroupsRef = useRef<{
@@ -473,7 +309,6 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
     hotspots?: LayerGroup;
     shelters?: LayerGroup;
     dispatch?: LayerGroup;
-    reports?: LayerGroup;
     pin?: LayerGroup;
   }>({});
 
@@ -483,41 +318,22 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
     hotspots: true,
     shelters: true,
     dispatch: true,
-    reports: true,
   });
 
   const [incidents, setIncidents] = useState<Record<string, SignalIncident[]>>(INITIAL_INCIDENTS);
   const [hotspots] = useState<Record<string, HotspotCluster[]>>(INITIAL_HOTSPOTS);
   const [shelters] = useState<Record<string, ShelterResource[]>>(INITIAL_SHELTERS);
   const [dispatchUnits, setDispatchUnits] = useState<Record<string, DispatchUnit[]>>(INITIAL_DISPATCH);
-  const [reports, setReports] = useState<CitizenReport[]>([]);
 
-  // Geolocation & Reporting state
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const [livePin, setLivePin] = useState<{ lat: number; lng: number; accuracy?: number; address?: string } | null>(null);
+  const [livePin, setLivePin] = useState<{ lat: number; lng: number; accuracy?: number; address?: string } | null>({
+    lat: 28.6289,
+    lng: 77.2185,
+    address: "Connaught Place South Block, New Delhi",
+  });
   const [locatingStatus, setLocatingStatus] = useState<string | null>(null);
-  const [reportNote, setReportNote] = useState("");
-  const [reportType, setReportType] = useState<CitizenReport["type"]>("Distress Call");
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-  const [reportFeedback, setReportFeedback] = useState<{ msg: string; success: boolean } | null>(null);
+  const [isDispatched, setIsDispatched] = useState(true);
 
-  const [currentTimeStr, setCurrentTimeStr] = useState("16:50");
-
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTimeStr(
-        now.getHours().toString().padStart(2, "0") +
-          ":" +
-          now.getMinutes().toString().padStart(2, "0")
-      );
-    };
-    updateTime();
-    const timer = setInterval(updateTime, 15000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Initialize Leaflet Map safely in client runtime
+  // Initialize Leaflet Map
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -554,7 +370,6 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
         hotspots: L.layerGroup().addTo(map),
         shelters: L.layerGroup().addTo(map),
         dispatch: L.layerGroup().addTo(map),
-        reports: L.layerGroup().addTo(map),
         pin: L.layerGroup().addTo(map),
       };
 
@@ -565,16 +380,9 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
         reverseGeocode(lat, lng);
       });
 
-      // If there's an active case, center on it
-      if (activeCaseId) {
-        const allIncs = Object.values(INITIAL_INCIDENTS).flat();
-        const activeInc = allIncs.find((i) => i.refId === activeCaseId);
-        if (activeInc) {
-          map.setView([activeInc.lat, activeInc.lng], 14);
-        }
-      }
+      // Center on active case
+      map.setView([28.6289, 77.2185], 14);
 
-      // Trigger size invalidation to avoid grey map tiles
       setTimeout(() => {
         try {
           map.invalidateSize();
@@ -598,87 +406,80 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
     if (!leafletMapRef.current) return;
     const currentR = REGIONS[region] || REGIONS["delhi"]!;
     leafletMapRef.current.flyTo(currentR.center, currentR.zoom, {
-      duration: 1.2,
+      duration: 1.0,
       easeLinearity: 0.25,
     });
   }, [region]);
 
-  // Reverse Geocoding helper
+  // Reverse Geocoding
   const reverseGeocode = async (lat: number, lng: number) => {
-    setLocatingStatus("LOOKING UP ADDRESS…");
+    setLocatingStatus("Looking up address…");
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
-        { headers: { "User-Agent": "TRACE-National-Helpline/1.0" } }
+        { headers: { "User-Agent": "TRACE-Staff-Portal/1.0" } }
       );
       if (!res.ok) throw new Error("Lookup error");
       const data = await res.json();
       const addr = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
       setLivePin((prev) => (prev ? { ...prev, address: addr } : { lat, lng, address: addr }));
-      setLocatingStatus("PIN SET · " + addr.slice(0, 42) + (addr.length > 42 ? "…" : ""));
+      setLocatingStatus("Pin calibrated: " + addr.slice(0, 36) + (addr.length > 36 ? "…" : ""));
     } catch {
       const fallback = `${lat.toFixed(4)}°N, ${lng.toFixed(4)}°E`;
       setLivePin((prev) => (prev ? { ...prev, address: fallback } : { lat, lng, address: fallback }));
-      setLocatingStatus("PIN SET · " + fallback);
+      setLocatingStatus("Pin calibrated: " + fallback);
     }
   };
 
-  // Browser Geolocation API ("📍 Use my live location" from Project-Shwaas)
+  // Browser Geolocation API ("📍 Use my live location")
   const useLiveLocation = () => {
     if (!("geolocation" in navigator)) {
-      setLocatingStatus("GEOLOCATION NOT SUPPORTED ON THIS DEVICE");
+      setLocatingStatus("Geolocation not supported on this device");
       return;
     }
-    setLocatingStatus("ACQUIRING HIGH-PRECISION GPS LOCK…");
+    setLocatingStatus("Acquiring GPS fix…");
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude, accuracy } = pos.coords;
         setLivePin({ lat: latitude, lng: longitude, accuracy });
         if (leafletMapRef.current) {
-          leafletMapRef.current.flyTo([latitude, longitude], 16, { duration: 1.2 });
+          leafletMapRef.current.flyTo([latitude, longitude], 15, { duration: 1.0 });
         }
         reverseGeocode(latitude, longitude);
       },
       (err) => {
         setLocatingStatus(
           err.code === 1
-            ? "PERMISSION DENIED — PLEASE CLICK ON THE MAP TO DROP PIN"
-            : "GPS SIGNAL TIMEOUT — CLICK THE MAP INSTEAD"
+            ? "Location permission denied"
+            : "GPS timeout — click map manually"
         );
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
     );
   };
 
-  // Re-render and synchronize all Leaflet markers when state updates
+  // Render markers
   useEffect(() => {
-    async function renderAllMarkers() {
+    async function renderMarkers() {
       if (!leafletMapRef.current) return;
       const L = await import("leaflet");
       const lg = layerGroupsRef.current;
-      if (!lg.incidents || !lg.hotspots || !lg.shelters || !lg.dispatch || !lg.reports || !lg.pin) return;
+      if (!lg.incidents || !lg.hotspots || !lg.shelters || !lg.dispatch || !lg.pin) return;
 
-      // 1. Incidents
+      // 1. Active Case & Incidents
       lg.incidents.clearLayers();
       if (layers.incidents) {
-        const currentIncs =
-          region === "national"
-            ? Object.values(incidents).flat()
-            : incidents[region] || [];
+        const currentIncs = incidents[region] || [];
 
         currentIncs.forEach((inc) => {
-          const isCaseSelected = activeCaseId && inc.refId === activeCaseId;
+          const isCaseSelected = inc.refId === activeCaseId;
           const color =
             inc.riskTier === "CRITICAL"
-              ? "#ef4444"
+              ? "var(--a-critical, #e0584f)"
               : inc.riskTier === "HIGH"
-              ? "#f97316"
-              : inc.riskTier === "ELEVATED"
-              ? "#eab308"
-              : "#10b981";
-
-          const isCritical = inc.svi >= 75 || isCaseSelected;
+              ? "var(--a-high, #e08b3d)"
+              : "var(--a-low, #3bb273)";
 
           const customIcon = L.divIcon({
             className: "trace-incident-icon",
@@ -687,11 +488,11 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
             html: `
               <div style="position:relative;width:42px;height:42px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
                 ${
-                  isCritical
-                    ? `<div style="position:absolute;top:50%;left:50%;width:40px;height:40px;border-radius:50%;border:2.5px solid ${isCaseSelected ? "#38bdf8" : color};animation:ringPulse 2.2s cubic-bezier(0.2,0.8,0.2,1) infinite;"></div>`
+                  isCaseSelected
+                    ? `<div style="position:absolute;top:50%;left:50%;width:40px;height:40px;border-radius:50%;border:2.5px solid #38bdf8;animation:ringPulse 2.2s cubic-bezier(0.2,0.8,0.2,1) infinite;"></div>`
                     : ""
                 }
-                <div style="width:30px;height:30px;border-radius:50%;background:${color};border:${isCaseSelected ? "3px solid #38bdf8" : "2.5px solid #0f172a"};display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px ${color}aa;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;color:#ffffff;line-height:1;">
+                <div style="width:30px;height:30px;border-radius:50%;background:${color};border:${isCaseSelected ? "3px solid #38bdf8" : "2px solid #141a23"};display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px ${color}99;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:11px;color:#ffffff;line-height:1;">
                   ${inc.svi}
                 </div>
               </div>
@@ -699,34 +500,14 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
           });
 
           const popupHtml = `
-            <div style="min-width:260px;max-width:320px;font-family:'Inter',sans-serif;color:#f8fafc;">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:6px;">
-                <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:${color};letter-spacing:0.06em;">${inc.refId}</span>
-                <span style="font-size:10px;font-weight:800;background:${color}22;color:${color};border:1px solid ${color}44;padding:2px 6px;border-radius:4px;letter-spacing:0.04em;">${inc.riskTier}</span>
+            <div style="min-width:240px;font-family:var(--sans,'Inter',sans-serif);color:#f8fafc;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:5px;">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;color:#e0a23d;">${inc.refId}</span>
+                <span style="font-size:10px;font-weight:800;background:rgba(224,88,79,0.2);color:#e0584f;border:1px solid rgba(224,88,79,0.4);padding:2px 6px;border-radius:4px;">${inc.riskTier}</span>
               </div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin-bottom:2px;">${inc.title}</div>
-              <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">${inc.category} · ${inc.timestamp}</div>
-              
-              <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.06);">
-                <div style="font-size:9.5px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Detected Trauma Signals</div>
-                <ul style="margin:0;padding-left:14px;font-size:11.5px;color:#e2e8f0;line-height:1.4;">
-                  ${inc.signals.map((s) => `<li>${s}</li>`).join("")}
-                </ul>
-              </div>
-
-              <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#94a3b8;margin-bottom:10px;">
-                <span>Nearest: <strong style="color:#f1f5f9;">${inc.nearestShelter}</strong></span>
-                <span style="font-family:'JetBrains Mono',monospace;color:#38bdf8;">ETA ~${inc.eta}</span>
-              </div>
-
-              <div style="display:flex;gap:6px;">
-                <a href="/staff/case/${inc.refId}" style="flex:1;text-align:center;background:#3b82f6;color:#ffffff;font-size:11px;font-weight:700;padding:7px 10px;border-radius:6px;text-decoration:none;display:inline-block;">
-                  View Case
-                </a>
-                <button onclick="window.__dispatchCase('${inc.id}')" style="flex:1;background:${inc.dispatched ? "#10b981" : "#ef4444"};color:#ffffff;border:none;font-size:11px;font-weight:700;padding:7px 10px;border-radius:6px;cursor:pointer;">
-                  ${inc.dispatched ? "CAD Dispatched" : "Dispatch Unit"}
-                </button>
-              </div>
+              <div style="font-size:13.5px;font-weight:700;color:#ffffff;margin-bottom:3px;">${inc.title}</div>
+              <div style="font-size:11px;color:#8b96a8;margin-bottom:8px;">${inc.category} · ${inc.timestamp}</div>
+              <div style="font-size:11px;color:#38bdf8;margin-bottom:4px;">Nearest: <strong>${inc.nearestShelter}</strong> (ETA ~${inc.eta})</div>
             </div>
           `;
 
@@ -736,408 +517,163 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
 
           if (isCaseSelected) {
             setTimeout(() => {
-              marker.openPopup();
-            }, 500);
+              try { marker.openPopup(); } catch {}
+            }, 600);
           }
         });
       }
 
-      // 2. Hotspots
-      lg.hotspots.clearLayers();
-      if (layers.hotspots) {
-        const currentHotspots =
-          region === "national"
-            ? Object.values(hotspots).flat()
-            : hotspots[region] || [];
-
-        currentHotspots.forEach((hs) => {
-          const color = hs.severity === "CRITICAL" ? "#ff2bd6" : "#f59e0b";
-          const hotspotIcon = L.divIcon({
-            className: "trace-hotspot-icon",
-            iconSize: [40, 40],
-            iconAnchor: [20, 20],
-            html: `
-              <div style="position:relative;width:40px;height:40px;display:flex;align-items:center;justify-content:center;">
-                <div style="position:absolute;top:50%;left:50%;width:38px;height:38px;border-radius:50%;border:2px solid ${color};animation:ringPulse 2s cubic-bezier(0.2,0.8,0.2,1) infinite;"></div>
-                <div style="width:22px;height:22px;border-radius:50%;background:${color};border:2px solid #0f172a;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px ${color};">
-                  <span style="font-size:11px;">⚠️</span>
-                </div>
-              </div>
-            `,
-          });
-
-          const popupHtml = `
-            <div style="min-width:260px;font-family:'Inter',sans-serif;color:#f8fafc;">
-              <div style="font-size:10px;font-weight:800;color:${color};letter-spacing:0.08em;text-transform:uppercase;">🔥 TRAUMA CONCENTRATION HOTSPOT</div>
-              <div style="font-size:14px;font-weight:700;color:#ffffff;margin:2px 0 4px;">${hs.name}</div>
-              <div style="font-size:11.5px;color:#94a3b8;margin-bottom:8px;">${hs.incidentCount} active signals detected in 1.5km radius</div>
-              
-              <div style="font-size:11.5px;color:#e2e8f0;margin-bottom:6px;"><strong>Dominant:</strong> ${hs.dominantSignal}</div>
-              <div style="background:rgba(255,43,214,0.1);border:1px solid rgba(255,43,214,0.3);padding:6px 8px;border-radius:6px;font-size:11px;color:#f472b6;margin-bottom:8px;">
-                <strong>Protocol:</strong> ${hs.recommendedAction}
-              </div>
-              <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#94a3b8;">
-                DISPATCHED SQUADS: ${hs.dispatchedUnits} ACTIVE UNITS
-              </div>
-            </div>
-          `;
-
-          L.marker([hs.lat, hs.lng], { icon: hotspotIcon })
-            .bindPopup(popupHtml)
-            .addTo(lg.hotspots!);
-        });
-      }
-
-      // 3. Shelters
+      // 2. Shelters
       lg.shelters.clearLayers();
       if (layers.shelters) {
-        const currentShelters =
-          region === "national"
-            ? Object.values(shelters).flat()
-            : shelters[region] || [];
-
+        const currentShelters = shelters[region] || [];
         currentShelters.forEach((sh) => {
           const shelterIcon = L.divIcon({
             className: "trace-shelter-icon",
-            iconSize: [30, 30],
-            iconAnchor: [15, 15],
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
             html: `
-              <div style="width:28px;height:28px;border-radius:8px;background:#059669;border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(5,150,105,0.6);font-size:13px;">
+              <div style="width:26px;height:26px;border-radius:7px;background:#3bb273;border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(59,178,115,0.7);font-size:12px;">
                 🏠
               </div>
             `,
           });
 
-          const popupHtml = `
-            <div style="min-width:240px;font-family:'Inter',sans-serif;color:#f8fafc;">
-              <div style="font-size:10px;font-weight:800;color:#34d399;letter-spacing:0.06em;">VERIFIED SAFE SHELTER RESOURCE</div>
-              <div style="font-size:13.5px;font-weight:700;color:#ffffff;margin:2px 0;">${sh.name}</div>
-              <div style="font-size:11.5px;color:#94a3b8;margin-bottom:6px;">${sh.type}</div>
-              <div style="font-size:11px;color:#cbd5e1;margin-bottom:4px;">Capacity: <strong>${sh.capacity}</strong></div>
-              <div style="font-size:11px;color:#34d399;font-weight:600;margin-bottom:8px;">Available Beds: ${sh.availableBeds} Ready Now</div>
-              <a href="tel:${sh.helpline}" style="display:inline-block;width:100%;text-align:center;background:#059669;color:#fff;padding:6px;border-radius:6px;text-decoration:none;font-size:11px;font-weight:700;">
-                Call Direct: ${sh.helpline}
-              </a>
-            </div>
-          `;
-
           L.marker([sh.lat, sh.lng], { icon: shelterIcon })
-            .bindPopup(popupHtml)
+            .bindPopup(`
+              <div style="min-width:220px;font-family:var(--sans,'Inter',sans-serif);color:#fff;">
+                <div style="font-size:10px;font-weight:800;color:#3bb273;">ONE-STOP CRISIS CENTER (OSCC)</div>
+                <div style="font-size:13px;font-weight:700;margin:2px 0;">${sh.name}</div>
+                <div style="font-size:11px;color:#8b96a8;margin-bottom:4px;">${sh.capacity} · <b>${sh.availableBeds} beds available</b></div>
+                <div style="font-size:11px;color:#e0a23d;font-weight:700;">Direct: ${sh.helpline}</div>
+              </div>
+            `)
             .addTo(lg.shelters!);
         });
       }
 
-      // 4. Dispatch Units
+      // 3. Dispatch Units
       lg.dispatch.clearLayers();
       if (layers.dispatch) {
-        const currentDispatch =
-          region === "national"
-            ? Object.values(dispatchUnits).flat()
-            : dispatchUnits[region] || [];
-
+        const currentDispatch = dispatchUnits[region] || [];
         currentDispatch.forEach((d) => {
-          const isEnRoute = d.status === "EN_ROUTE";
           const dispatchIcon = L.divIcon({
             className: "trace-dispatch-icon",
             iconSize: [28, 28],
             iconAnchor: [14, 14],
             html: `
-              <div style="width:26px;height:26px;border-radius:50%;background:#2563eb;border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(37,99,235,0.8);font-size:12px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#3d82f6;border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(61,130,246,0.8);font-size:12px;">
                 🚓
               </div>
             `,
           });
 
-          const popupHtml = `
-            <div style="min-width:220px;font-family:'Inter',sans-serif;color:#f8fafc;">
-              <div style="font-size:10px;font-weight:800;color:#60a5fa;letter-spacing:0.06em;">CAD EMERGENCY MOBILE UNIT</div>
-              <div style="font-size:13px;font-weight:700;color:#ffffff;margin:2px 0;">${d.code}</div>
-              <div style="font-size:11.5px;color:#94a3b8;margin-bottom:6px;">${d.type}</div>
-              <div style="display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;background:${isEnRoute ? "#f59e0b22" : "#10b98122"};color:${isEnRoute ? "#f59e0b" : "#10b981"};border:1px solid ${isEnRoute ? "#f59e0b44" : "#10b98144"};">
-                STATUS: ${d.status}
-              </div>
-              ${d.assignedCase ? `<div style="font-size:11px;color:#cbd5e1;margin-top:6px;">Assigned: <strong style="color:#60a5fa;">${d.assignedCase}</strong></div>` : ""}
-            </div>
-          `;
-
           L.marker([d.lat, d.lng], { icon: dispatchIcon })
-            .bindPopup(popupHtml)
+            .bindPopup(`
+              <div style="min-width:200px;font-family:var(--sans,'Inter',sans-serif);color:#fff;">
+                <div style="font-size:10px;font-weight:800;color:#3d82f6;">CAD MOBILE POLICE UNIT</div>
+                <div style="font-size:13px;font-weight:700;margin:2px 0;">${d.code}</div>
+                <div style="font-size:11px;color:#8b96a8;">Status: <b style="color:#e0a23d;">${d.status}</b></div>
+                ${d.assignedCase ? `<div style="font-size:11px;color:#cbd5e1;margin-top:4px;">Assigned to: <b>${d.assignedCase}</b></div>` : ""}
+              </div>
+            `)
             .addTo(lg.dispatch!);
         });
       }
 
-      // 5. Citizen SOS Reports
-      lg.reports.clearLayers();
-      if (layers.reports) {
-        reports.forEach((rep) => {
-          const reportIcon = L.divIcon({
-            className: "trace-report-icon",
-            iconSize: [26, 26],
-            iconAnchor: [13, 13],
+      // 4. Hotspots
+      lg.hotspots.clearLayers();
+      if (layers.hotspots) {
+        const currentHotspots = hotspots[region] || [];
+        currentHotspots.forEach((hs) => {
+          const hotspotIcon = L.divIcon({
+            className: "trace-hotspot-icon",
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
             html: `
-              <div style="width:24px;height:24px;border-radius:50%;background:#8b5cf6;border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(139,92,246,0.8);font-size:11px;">
-                📢
+              <div style="position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center;">
+                <div style="position:absolute;top:50%;left:50%;width:34px;height:34px;border-radius:50%;border:2px solid #e08b3d;animation:ringPulse 2.2s infinite;"></div>
+                <div style="width:20px;height:20px;border-radius:50%;background:#e08b3d;border:2px solid #141a23;display:flex;align-items:center;justify-content:center;font-size:10px;">
+                  ⚠️
+                </div>
               </div>
             `,
           });
 
-          const popupHtml = `
-            <div style="min-width:200px;font-family:'Inter',sans-serif;color:#f8fafc;">
-              <div style="font-size:10px;font-weight:800;color:#a78bfa;letter-spacing:0.06em;">CITIZEN GEOTAGGED DISTRESS REPORT</div>
-              <div style="font-size:13px;font-weight:700;color:#ffffff;margin:2px 0;">${rep.type}</div>
-              <div style="font-size:11px;color:#cbd5e1;margin-bottom:4px;">${rep.address}</div>
-              <div style="font-size:10px;color:#94a3b8;">Confidence: ${Math.round(rep.confidence * 100)}% · ${rep.timeAgo}</div>
-            </div>
-          `;
-
-          L.marker([rep.lat, rep.lng], { icon: reportIcon })
-            .bindPopup(popupHtml)
-            .addTo(lg.reports!);
+          L.marker([hs.lat, hs.lng], { icon: hotspotIcon })
+            .bindPopup(`
+              <div style="min-width:220px;font-family:var(--sans,'Inter',sans-serif);color:#fff;">
+                <div style="font-size:10px;font-weight:800;color:#e08b3d;">TRAUMA RISK HOTSPOT</div>
+                <div style="font-size:13px;font-weight:700;margin:2px 0;">${hs.name}</div>
+                <div style="font-size:11px;color:#8b96a8;">${hs.incidentCount} incidents clustered · ${hs.dominantSignal}</div>
+              </div>
+            `)
+            .addTo(lg.hotspots!);
         });
       }
 
-      // 6. Live Pin / Geolocation Marker
+      // 5. GPS Pin
       lg.pin.clearLayers();
       if (livePin) {
         const pinIcon = L.divIcon({
           className: "trace-pin-icon",
-          iconSize: [32, 32],
-          iconAnchor: [16, 32],
-          html: `
-            <div style="position:relative;display:flex;flex-direction:column;align-items:center;">
-              <div style="font-size:24px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.8));">📍</div>
-            </div>
-          `,
+          iconSize: [28, 28],
+          iconAnchor: [14, 28],
+          html: `<div style="font-size:22px;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.8));">📍</div>`,
         });
 
         L.marker([livePin.lat, livePin.lng], { icon: pinIcon })
-          .bindPopup(
-            `<div style="font-family:'Inter',sans-serif;color:#fff;"><strong>GPS Lock:</strong><br>${livePin.address || `${livePin.lat.toFixed(4)}, ${livePin.lng.toFixed(4)}`}</div>`
-          )
+          .bindPopup(`<div style="font-family:var(--sans);font-size:12px;color:#fff;"><strong>GPS Lock:</strong><br>${livePin.address || `${livePin.lat.toFixed(4)}, ${livePin.lng.toFixed(4)}`}</div>`)
           .addTo(lg.pin);
-
-        if (livePin.accuracy) {
-          L.circle([livePin.lat, livePin.lng], {
-            radius: livePin.accuracy,
-            color: "#38bdf8",
-            fillColor: "#38bdf8",
-            fillOpacity: 0.15,
-            weight: 1.5,
-          }).addTo(lg.pin);
-        }
       }
     }
 
-    renderAllMarkers();
-  }, [layers, incidents, hotspots, shelters, dispatchUnits, reports, livePin, region, activeCaseId]);
+    renderMarkers();
+  }, [layers, incidents, shelters, dispatchUnits, hotspots, livePin, region, activeCaseId]);
 
-  // Global window handler for popup action dispatch
-  useEffect(() => {
-    (window as any).__dispatchCase = (incId: string) => {
-      setIncidents((prev) => {
-        const updated = { ...prev };
-        Object.keys(updated).forEach((r) => {
-          const list = updated[r];
-          if (list) {
-            updated[r] = list.map((inc) =>
-              inc.id === incId ? { ...inc, dispatched: true } : inc
-            );
-          }
-        });
-        return updated;
-      });
-    };
-    return () => {
-      delete (window as any).__dispatchCase;
-    };
-  }, []);
-
-  // Submit Geotagged Distress Report
-  const handleSubmitReport = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!livePin) {
-      setReportFeedback({
-        msg: "Please click on the map or tap 'Use my live location' to drop a GPS pin.",
-        success: false,
-      });
-      return;
-    }
-
-    setIsSubmittingReport(true);
-
-    setTimeout(() => {
-      const newReport: CitizenReport = {
-        id: "rep-" + Date.now(),
-        lat: livePin.lat,
-        lng: livePin.lng,
-        address: livePin.address || `${livePin.lat.toFixed(4)}, ${livePin.lng.toFixed(4)}`,
-        type: reportType,
-        confidence: 0.94,
-        timeAgo: "Just now",
-      };
-
-      setReports((prev) => [newReport, ...prev]);
-
-      const newIncident: SignalIncident = {
-        id: "inc-gen-" + Date.now(),
-        refId: "NHAA-" + Math.random().toString(36).substring(2, 6).toUpperCase() + "-SOS",
-        title: livePin.address?.split(",")[0] || "Geotagged Emergency Distress",
-        lat: livePin.lat,
-        lng: livePin.lng,
-        svi: 82,
-        riskTier: "CRITICAL",
-        category: "Immediate Danger",
-        signals: ["Real-time Citizen SOS", reportNote || "Panic button activated", "GPS verified location"],
-        nearestShelter: "Sakhi OSCC Emergency Team",
-        eta: "5 mins",
-        dispatched: true,
-        timestamp: "Just now",
-      };
-
-      setIncidents((prev) => ({
-        ...prev,
-        [region]: [newIncident, ...(prev[region] || [])],
-      }));
-
-      setIsSubmittingReport(false);
-      setReportFeedback({
-        msg: `SOS Signal successfully triangulated! Reference ID: ${newIncident.refId}. Dispatch squad notified.`,
-        success: true,
-      });
-
-      setReportNote("");
-    }, 800);
-  };
-
-  const currentIncidents =
-    region === "national"
-      ? Object.values(incidents).flat()
-      : incidents[region] || [];
-
-  const currentHotspots =
-    region === "national"
-      ? Object.values(hotspots).flat()
-      : hotspots[region] || [];
+  const activeInc = (incidents[region] || []).find((i) => i.refId === activeCaseId) || (incidents["delhi"]?.[0]);
 
   return (
-    <div className={`text-[#f1f5f9] font-sans antialiased ${isEmbedded ? "" : "min-h-screen bg-[#07090e]"}`}>
-      {/* Header Section Matching Project-Shwaas Layout */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-5">
+    <div>
+      {/* Top Header of the Section matching Staff Theme */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14, marginBottom: 16 }}>
         <div>
-          <div className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.2em] text-slate-400 mb-1.5">
-            <Radio className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            LIVE SIGNAL RADAR · <span className="text-white font-bold">{REGIONS[region]?.label.toUpperCase()}</span>
-            {activeCaseId && (
-              <span className="ml-2 px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/40 text-[10px]">
-                CASE: {activeCaseId}
-              </span>
-            )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#fff", display: "flex", alignItems: "center", gap: 7 }}>
+              <Navigation style={{ width: 17, height: 17, color: "var(--a-accent, #3d82f6)" }} />
+              Geographic Signal Radar &amp; Proximity Triage
+            </h3>
+            <span
+              style={{
+                fontSize: 10.5,
+                fontFamily: "var(--font-mono, 'JetBrains Mono', monospace)",
+                fontWeight: 700,
+                padding: "2px 7px",
+                borderRadius: 4,
+                background: "rgba(59, 178, 115, 0.15)",
+                color: "var(--a-low, #3bb273)",
+                border: "1px solid rgba(59, 178, 115, 0.3)",
+              }}
+            >
+              CAD 1091 / NHAA 14566 LIVE
+            </span>
           </div>
-          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-white leading-none">
-            Every signal, on one <em className="italic font-serif text-amber-400">map.</em>
-          </h2>
+          <p style={{ fontSize: 12.5, color: "var(--a-muted, #8b96a8)", margin: 0 }}>
+            Triangulating active case incident coordinates, nearby One-Stop Crisis Centers (OSCC), and emergency response units.
+          </p>
         </div>
 
-        {/* SVI Risk Legend Chips */}
-        <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] tracking-wider text-slate-300">
-          <span className="inline-flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            ROUTINE (0-25)
-          </span>
-          <span className="inline-flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-yellow-400" />
-            ELEVATED (26-50)
-          </span>
-          <span className="inline-flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-orange-500" />
-            HIGH (51-75)
-          </span>
-          <span className="inline-flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            CRITICAL (76-100)
-          </span>
-          <span className="inline-flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-md border border-white/10">
-            <span className="w-2 h-2 rounded-full bg-fuchsia-500" />
-            HOTSPOT
-          </span>
-        </div>
-      </div>
-
-      {/* Toolbar: Layer Filters + City Select + Report CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        {/* Layer Filter Toggles */}
-        <div className="flex flex-wrap items-center gap-1.5" id="layerToggles">
-          <button
-            type="button"
-            onClick={() => setLayers((prev) => ({ ...prev, incidents: !prev.incidents }))}
-            className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all ${
-              layers.incidents
-                ? "bg-amber-500 text-black border-amber-400 font-bold shadow-sm"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-          >
-            INCIDENTS ({currentIncidents.length})
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setLayers((prev) => ({ ...prev, hotspots: !prev.hotspots }))}
-            className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all ${
-              layers.hotspots
-                ? "bg-fuchsia-500 text-black border-fuchsia-400 font-bold shadow-sm"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-          >
-            HOTSPOTS ({currentHotspots.length})
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setLayers((prev) => ({ ...prev, shelters: !prev.shelters }))}
-            className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all ${
-              layers.shelters
-                ? "bg-emerald-500 text-black border-emerald-400 font-bold shadow-sm"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-          >
-            SHELTERS (OSCC)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setLayers((prev) => ({ ...prev, dispatch: !prev.dispatch }))}
-            className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all ${
-              layers.dispatch
-                ? "bg-blue-500 text-white border-blue-400 font-bold shadow-sm"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-          >
-            CAD UNITS
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setLayers((prev) => ({ ...prev, reports: !prev.reports }))}
-            className={`font-mono text-[10px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg border transition-all ${
-              layers.reports
-                ? "bg-violet-500 text-white border-violet-400 font-bold shadow-sm"
-                : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
-            }`}
-          >
-            SOS REPORTS ({reports.length})
-          </button>
-        </div>
-
-        {/* Region Selector + Report Button */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        {/* Region & Layer Controls */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <select
             value={region}
             onChange={(e) => setRegion(e.target.value)}
             aria-label="Select command region"
-            className="font-mono text-[10.5px] tracking-wider px-2.5 py-1.5 rounded-lg border border-white/15 bg-slate-900/80 text-white focus:outline-none focus:border-amber-400 cursor-pointer backdrop-blur-md"
+            className="search-box"
+            style={{ fontSize: 11.5, padding: "5px 10px", height: "auto", minHeight: 32 }}
           >
             {Object.entries(REGIONS).map(([k, v]) => (
-              <option key={k} value={k} className="bg-slate-900 text-white">
+              <option key={k} value={k}>
                 {v.label}
               </option>
             ))}
@@ -1145,267 +681,166 @@ export function SignalRadarMap({ activeCaseId, isEmbedded = false }: SignalRadar
 
           <button
             type="button"
-            onClick={() => setIsReportOpen(!isReportOpen)}
-            className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-600 to-amber-600 text-white hover:opacity-95 transition-all shadow-md shadow-red-900/30 cursor-pointer"
+            className={`chip ${layers.incidents ? "on" : ""}`}
+            onClick={() => setLayers((prev) => ({ ...prev, incidents: !prev.incidents }))}
+            style={{ fontSize: 11, padding: "4px 8px" }}
           >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            {isReportOpen ? "Close SOS Panel" : "+ Report Distress / SOS"}
+            Incidents
+          </button>
+          <button
+            type="button"
+            className={`chip ${layers.shelters ? "on" : ""}`}
+            onClick={() => setLayers((prev) => ({ ...prev, shelters: !prev.shelters }))}
+            style={{ fontSize: 11, padding: "4px 8px" }}
+          >
+            Shelters (OSCC)
+          </button>
+          <button
+            type="button"
+            className={`chip ${layers.dispatch ? "on" : ""}`}
+            onClick={() => setLayers((prev) => ({ ...prev, dispatch: !prev.dispatch }))}
+            style={{ fontSize: 11, padding: "4px 8px" }}
+          >
+            CAD Units
+          </button>
+          <button
+            type="button"
+            className={`chip ${layers.hotspots ? "on" : ""}`}
+            onClick={() => setLayers((prev) => ({ ...prev, hotspots: !prev.hotspots }))}
+            style={{ fontSize: 11, padding: "4px 8px" }}
+          >
+            Hotspots
           </button>
         </div>
       </div>
 
-      {/* Map Viewport Card */}
-      <div className="relative rounded-2xl bg-slate-950/90 border border-white/10 p-3 shadow-2xl overflow-hidden">
-        {/* Leaflet Map Canvas */}
+      {/* Main Map Box */}
+      <div
+        style={{
+          position: "relative",
+          height: 380,
+          borderRadius: 12,
+          overflow: "hidden",
+          border: "1px solid var(--a-border, #2c3645)",
+          background: "#0b0f14",
+          marginBottom: 16,
+        }}
+      >
+        <div ref={mapContainerRef} style={{ width: "100%", height: "100%" }} />
+
+        {/* Live Location Calibration Pill */}
         <div
-          ref={mapContainerRef}
-          id="leafletMap"
-          className="w-full h-[460px] sm:h-[520px] rounded-xl overflow-hidden relative bg-[#0b0f14]"
-          style={{ zIndex: 10 }}
-        />
-
-        {/* CAD Sync Badge (Top Right of Map) */}
-        <div className="absolute top-5 right-5 z-20 pointer-events-none inline-flex items-center gap-2 font-mono text-[9.5px] tracking-widest text-slate-200 bg-slate-950/85 backdrop-blur-md border border-white/15 rounded-lg px-2.5 py-1.5 shadow-lg">
-          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-          <span>
-            ⚡ CAD & NHAA 14566 LIVE · {currentIncidents.length} SIGNALS · {currentTimeStr}
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: 12,
+            zIndex: 800,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            background: "rgba(20, 26, 35, 0.88)",
+            border: "1px solid var(--a-border, #2c3645)",
+            backdropFilter: "blur(12px)",
+            borderRadius: 8,
+            padding: "6px 12px",
+            fontSize: 11.5,
+            color: "var(--a-text, #e8ecf2)",
+          }}
+        >
+          <button
+            type="button"
+            onClick={useLiveLocation}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--a-accent, #3d82f6)",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              fontWeight: 700,
+              fontSize: 11.5,
+              padding: 0,
+            }}
+          >
+            <Crosshair style={{ width: 14, height: 14 }} />
+            Calibrate GPS
+          </button>
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>|</span>
+          <span style={{ fontSize: 11, color: "var(--a-muted, #8b96a8)", fontFamily: "var(--font-mono, monospace)" }}>
+            {locatingStatus || livePin?.address || `${livePin?.lat.toFixed(4)}, ${livePin?.lng.toFixed(4)}`}
           </span>
-        </div>
-
-        {/* Map Footer Note */}
-        <div className="font-mono text-[9.5px] uppercase tracking-widest text-slate-400 text-center mt-2.5 opacity-80">
-          RADAR ACTIVE · {currentIncidents.length} INCIDENTS · {currentHotspots.length} TRAUMA HOTSPOTS · CLICK MAP TO DROP PIN
         </div>
       </div>
 
-      {/* Citizen & Victim SOS Report Panel */}
-      {isReportOpen && (
-        <section className="mt-4 rounded-2xl border border-amber-500/30 bg-slate-950/95 backdrop-blur-xl p-5 shadow-2xl">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
-            <div>
-              <div className="font-mono text-[9.5px] uppercase tracking-widest text-amber-400">
-                CRISIS GEOLOCATION & TRIAGE INTAKE
-              </div>
-              <h3 className="font-serif text-xl font-normal text-white mt-0.5">
-                Report distress or request immediate dispatch
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsReportOpen(false)}
-              className="text-slate-400 hover:text-white text-2xl leading-none p-1"
-            >
-              ×
-            </button>
+      {/* Proximity & Incident Details Sub-Grid matching Staff Theme */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: 12,
+        }}
+      >
+        {/* Sub-Panel 1: Incident Location */}
+        <div
+          style={{
+            background: "var(--a-panel2, #222b38)",
+            border: "1px solid var(--a-border, #2c3645)",
+            borderRadius: 10,
+            padding: "12px 14px",
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--a-muted, #8b96a8)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
+            📍 Triangulated Location
           </div>
-
-          <form onSubmit={handleSubmitReport} className="space-y-3.5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-400 mb-1">
-                  Incident Type / Distress Category
-                </label>
-                <select
-                  value={reportType}
-                  onChange={(e) => setReportType(e.target.value as any)}
-                  className="w-full font-sans text-xs bg-slate-900 border border-white/15 rounded-lg p-2 text-white focus:outline-none focus:border-amber-400"
-                >
-                  <option value="Distress Call">Distress Call / Psychological Crisis</option>
-                  <option value="Acoustic Panic">Immediate Physical Threat / Barricaded</option>
-                  <option value="Domestic Disturbance">Intimate Partner Coercion / Stalking</option>
-                  <option value="SOS Beacon">Silent Emergency SOS Beacon</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-400 mb-1">
-                  Location / GPS Fix
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    placeholder="Click on the map or tap GPS button"
-                    value={livePin?.address || (livePin ? `${livePin.lat.toFixed(4)}, ${livePin.lng.toFixed(4)}` : "")}
-                    className="flex-1 font-mono text-xs bg-slate-900 border border-white/15 rounded-lg p-2 text-amber-300 focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={useLiveLocation}
-                    className="inline-flex items-center gap-1.5 font-mono text-xs px-2.5 py-1.5 rounded-lg bg-sky-500/10 border border-sky-400/30 text-sky-300 hover:bg-sky-500/20 transition-colors whitespace-nowrap cursor-pointer"
-                  >
-                    <Crosshair className="w-3.5 h-3.5" />
-                    📍 Use my live location
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-mono text-[10px] uppercase tracking-wider text-slate-400 mb-1">
-                Distress Note / Threat Details (Optional)
-              </label>
-              <textarea
-                rows={2}
-                value={reportNote}
-                onChange={(e) => setReportNote(e.target.value)}
-                placeholder="Describe situational urgency (e.g. caller trapped in rear room, aggressor threatening violence)"
-                className="w-full font-sans text-xs bg-slate-900 border border-white/15 rounded-lg p-2 text-white focus:outline-none focus:border-amber-400 placeholder:text-slate-500"
-              />
-            </div>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <div className="flex items-center gap-2">
-                <button
-                  type="submit"
-                  disabled={isSubmittingReport}
-                  className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider font-bold px-4 py-2 rounded-lg bg-gradient-to-r from-red-600 to-amber-600 text-white hover:opacity-90 transition-all shadow-lg shadow-red-900/30 cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmittingReport ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      Triangulating & Scoring SVI…
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      Submit Distress Signal →
-                    </>
-                  )}
-                </button>
-
-                <span className="font-mono text-[9.5px] tracking-wider text-slate-400">
-                  {locatingStatus || "CLICK MAP TO PINPOINT EXACT CO-ORDINATES"}
-                </span>
-              </div>
-
-              {reportFeedback && (
-                <div
-                  className={`font-mono text-xs px-2.5 py-1 rounded-lg border ${
-                    reportFeedback.success
-                      ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/30"
-                      : "bg-red-500/10 text-red-300 border-red-500/30"
-                  }`}
-                >
-                  {reportFeedback.msg}
-                </div>
-              )}
-            </div>
-          </form>
-        </section>
-      )}
-
-      {/* Live Ranked Distress Feed */}
-      <section className="mt-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3">
-          <div>
-            <div className="font-mono text-[9.5px] uppercase tracking-widest text-amber-400">
-              LIVE TRAUMA INCIDENTS & HOTSPOTS
-            </div>
-            <h3 className="font-serif text-2xl font-normal text-white">
-              Ranked signals requiring <em className="italic font-serif text-amber-400">immediate triage</em>.
-            </h3>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
+            {activeInc?.title || "Connaught Place South Block"}
           </div>
-          <div className="font-mono text-[10.5px] text-slate-400">
-            Sorted by SVI severity & SLA deadline
+          <div style={{ fontSize: 11.5, color: "var(--a-muted, #8b96a8)", fontFamily: "var(--font-mono, monospace)" }}>
+            {livePin?.lat.toFixed(4)}°N, {livePin?.lng.toFixed(4)}°E (±8m accuracy)
           </div>
         </div>
 
-        <div className="rounded-xl border border-white/10 bg-slate-950/80 overflow-hidden divide-y divide-white/10 shadow-xl">
-          {currentIncidents.length === 0 ? (
-            <div className="p-6 text-center font-mono text-xs text-slate-400">
-              NO ACTIVE INCIDENTS IN THIS REGION
-            </div>
-          ) : (
-            currentIncidents.map((inc) => {
-              const color =
-                inc.riskTier === "CRITICAL"
-                  ? "bg-red-500 text-white"
-                  : inc.riskTier === "HIGH"
-                  ? "bg-orange-500 text-white"
-                  : inc.riskTier === "ELEVATED"
-                  ? "bg-yellow-500 text-black"
-                  : "bg-emerald-500 text-black";
-
-              return (
-                <div
-                  key={inc.id}
-                  className="p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-white/[0.02] transition-colors"
-                >
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div
-                      className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg font-mono font-bold text-xs shadow-md ${color}`}
-                    >
-                      {inc.svi}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                        <span className="font-mono text-xs font-bold text-amber-400">
-                          {inc.refId}
-                        </span>
-                        <span className="text-white font-medium text-sm">
-                          {inc.title}
-                        </span>
-                        <span
-                          className={`text-[9.5px] font-mono px-2 py-0.5 rounded-full border ${
-                            inc.riskTier === "CRITICAL"
-                              ? "bg-red-500/10 text-red-400 border-red-500/30 animate-pulse"
-                              : "bg-white/5 text-slate-300 border-white/10"
-                          }`}
-                        >
-                          {inc.riskTier}
-                        </span>
-                      </div>
-
-                      <div className="font-mono text-[10.5px] text-slate-400 flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
-                        <span>{inc.category}</span>
-                        <span>•</span>
-                        <span>Nearest: {inc.nearestShelter}</span>
-                        <span>•</span>
-                        <span className="text-sky-400">ETA ~{inc.eta}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Triggers */}
-                  <div className="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
-                    <a
-                      href={`/staff/case/${inc.refId}`}
-                      className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Examine
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => (window as any).__dispatchCase?.(inc.id)}
-                      className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                        inc.dispatched
-                          ? "bg-emerald-500/10 text-emerald-300 border border-emerald-500/30"
-                          : "bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-900/30 cursor-pointer"
-                      }`}
-                    >
-                      {inc.dispatched ? (
-                        <>
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                          Dispatched
-                        </>
-                      ) : (
-                        <>
-                          <Truck className="w-3.5 h-3.5" />
-                          Dispatch
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              );
-            })
-          )}
+        {/* Sub-Panel 2: Nearest Shelter Resource */}
+        <div
+          style={{
+            background: "var(--a-panel2, #222b38)",
+            border: "1px solid var(--a-border, #2c3645)",
+            borderRadius: 10,
+            padding: "12px 14px",
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--a-low, #3bb273)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, display: "flex", alignItems: "center", gap: 5 }}>
+            🏠 Nearest OSCC Shelter (4 mins away)
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
+            Sakhi One-Stop Center — Lady Hardinge
+          </div>
+          <div style={{ fontSize: 11.5, color: "var(--a-muted, #8b96a8)" }}>
+            12 beds ready · 24/7 Medical &amp; Legal Support
+          </div>
         </div>
-      </section>
+
+        {/* Sub-Panel 3: Assigned CAD Unit */}
+        <div
+          style={{
+            background: "var(--a-panel2, #222b38)",
+            border: "1px solid var(--a-border, #2c3645)",
+            borderRadius: 10,
+            padding: "12px 14px",
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 700, color: "var(--a-accent, #3d82f6)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4, display: "flex", alignItems: "center", gap: 5 }}>
+            🚓 Emergency Response CAD Squad
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 2 }}>
+            CAD-SQUAD-1091-ALPHA
+          </div>
+          <div style={{ fontSize: 11.5, color: "var(--a-muted, #8b96a8)" }}>
+            Status: <b style={{ color: isDispatched ? "var(--a-low, #3bb273)" : "var(--a-high, #e08b3d)" }}>{isDispatched ? "En Route (ETA 4m)" : "Standby"}</b>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

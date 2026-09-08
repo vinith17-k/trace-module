@@ -100,27 +100,7 @@ function CaseQueuePage() {
   return (
     <StaffLayout mode="staff">
       <div className="auth-topline">
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h2>Case Queue</h2>
-          <Link
-            to="/map"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              fontSize: 11.5,
-              fontWeight: 800,
-              padding: "4px 10px",
-              borderRadius: 6,
-              background: "rgba(245, 158, 11, 0.15)",
-              color: "#fbbf24",
-              border: "1px solid rgba(245, 158, 11, 0.3)",
-              textDecoration: "none",
-            }}
-          >
-            <span>⚡ Live Signal Radar Map</span>
-          </Link>
-        </div>
+        <h2>Case Queue</h2>
         <span className="auth-role">Counsellor · Priya S.</span>
       </div>
 

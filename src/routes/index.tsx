@@ -62,22 +62,6 @@ function PublicHome() {
             >
               How it works
             </Link>
-            <Link
-              to="/map"
-              className="btn"
-              style={{
-                background: "rgba(18,24,34,0.06)",
-                border: "1.5px solid #1f2732",
-                color: "var(--pub-ink)",
-                padding: "12px 20px",
-                fontSize: 14.5,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <span>⚡ Live Signal Map</span>
-            </Link>
           </div>
         </div>
         <div className="blob-art">

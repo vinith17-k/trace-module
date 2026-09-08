@@ -12,6 +12,15 @@ function StaffLoginPage() {
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
+  const doLoginWithRole = (emailVal: string, roleVal: string, nameVal: string, targetPath: "/staff/queue" | "/staff/police" | "/admin") => {
+    setError(false);
+    sessionStorage.setItem(
+      "trace_staff_user",
+      JSON.stringify({ email: emailVal, role: roleVal, name: nameVal }),
+    );
+    navigate({ to: targetPath });
+  };
+
   const doLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -19,12 +28,29 @@ function StaffLoginPage() {
       return;
     }
     setError(false);
-    // In prototype mode, store authenticated state in sessionStorage and navigate
+    const lower = email.toLowerCase();
+    const role = lower.includes("admin")
+      ? "admin"
+      : lower.includes("police")
+        ? "law_enforcement"
+        : "counsellor";
+    const name = lower.includes("admin")
+      ? "Dr. Ramesh Iyer"
+      : lower.includes("police")
+        ? "SI Rakesh Yadav"
+        : "Priya S.";
+    const targetPath =
+      role === "admin"
+        ? "/admin"
+        : role === "law_enforcement"
+          ? "/staff/police"
+          : "/staff/queue";
+
     sessionStorage.setItem(
       "trace_staff_user",
-      JSON.stringify({ email, role: "counsellor", name: "Priya S." }),
+      JSON.stringify({ email, role, name }),
     );
-    navigate({ to: "/staff/queue" });
+    navigate({ to: targetPath });
   };
 
   return (
@@ -45,7 +71,7 @@ function StaffLoginPage() {
           border: "1px solid var(--a-border)",
           borderRadius: 16,
           padding: "36px 34px",
-          maxWidth: 360,
+          maxWidth: 400,
           width: "100%",
         }}
         onSubmit={doLogin}
@@ -54,22 +80,40 @@ function StaffLoginPage() {
           <span className="dot" />
           TRACE · Staff Portal
         </Link>
-        <p style={{ fontSize: 12.5, color: "var(--a-muted)", margin: "0 0 18px" }}>
-          Sign in with your authorised account (Prototype mode pre-filled)
+        <p style={{ fontSize: 12.5, color: "var(--a-muted)", margin: "0 0 14px" }}>
+          Sign in with your authorised account or choose a demo role:
         </p>
-        <p
-          style={{
-            fontSize: 11.5,
-            color: "var(--a-muted)",
-            margin: "0 0 12px",
-            padding: "8px 12px",
-            background: "rgba(91,141,239,0.08)",
-            borderRadius: 6,
-            border: "1px solid rgba(91,141,239,0.2)",
-          }}
-        >
-          Demo: counsellor@nhaa.gov.in / demoPassword123
-        </p>
+
+        {/* 1-Click Demo Logins */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 18 }}>
+          <button
+            type="button"
+            className="btn-ghost"
+            style={{ fontSize: 12, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "6px 10px" }}
+            onClick={() => doLoginWithRole("priya.s@nhaa.gov.in", "counsellor", "Priya S.", "/staff/queue")}
+          >
+            <span>🧑‍⚕️ Quick Demo: <b>Counsellor</b> (Priya S.)</span>
+            <span style={{ opacity: 0.6 }}>Queue →</span>
+          </button>
+          <button
+            type="button"
+            className="btn-ghost"
+            style={{ fontSize: 12, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "6px 10px" }}
+            onClick={() => doLoginWithRole("r.yadav@police.mh.gov.in", "law_enforcement", "SI Rakesh Yadav", "/staff/police")}
+          >
+            <span>👮 Quick Demo: <b>Police / Protection</b></span>
+            <span style={{ opacity: 0.6 }}>Dispatch →</span>
+          </button>
+          <button
+            type="button"
+            className="btn-ghost"
+            style={{ fontSize: 12, textAlign: "left", display: "flex", justifyContent: "space-between", padding: "6px 10px" }}
+            onClick={() => doLoginWithRole("r.iyer@socialjustice.gov.in", "admin", "Dr. Ramesh Iyer", "/admin")}
+          >
+            <span>⚙️ Quick Demo: <b>System Admin</b></span>
+            <span style={{ opacity: 0.6 }}>Admin →</span>
+          </button>
+        </div>
 
         <div style={{ marginBottom: 14 }}>
           <label className="field-label" htmlFor="loginEmail">

@@ -18,6 +18,14 @@ interface StoredResult {
     priority?: string;
     assignedAuthority?: string;
   };
+  analysis?: {
+    sviScore?: number;
+    riskCategory?: string;
+    traumaIndicators?: string[];
+    actionType?: string | null;
+    priority?: string | null;
+    assignedAuthority?: string | null;
+  } | null;
 }
 
 function PostIntakeConfirmationPage() {
@@ -45,7 +53,8 @@ function PostIntakeConfirmationPage() {
       ? `NHAA-${result.interactionId.slice(0, 4).toUpperCase()}-K91`
       : "NHAA-4F82-K91");
 
-  const isHighRisk = result?.riskCategory === "critical" || result?.riskCategory === "high";
+  const effectiveRisk = result?.analysis?.riskCategory ?? result?.riskCategory;
+  const isHighRisk = effectiveRisk === "critical" || effectiveRisk === "high";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(refId);

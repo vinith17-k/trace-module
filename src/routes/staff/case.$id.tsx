@@ -138,7 +138,8 @@ function CaseDetailPage() {
 
       <div className="auth-topline">
         <h2>
-          Case {caseId} <BadgeRisk level="critical" style={{ marginLeft: 8 }} />
+          Case <span className="font-mono tabular-nums" style={{ letterSpacing: "0.03em" }}>{caseId}</span>{" "}
+          <BadgeRisk level="critical" style={{ marginLeft: 8 }} />
         </h2>
         <span className="auth-role">Voice Intake · 12 min ago</span>
       </div>

@@ -152,7 +152,7 @@ function SviWeightsPage() {
                         step="0.05"
                         min="0"
                         max="1"
-                        className="weight-input"
+                        className="weight-input font-mono tabular-nums"
                         style={{ width: 62 }}
                         value={row.weight}
                         onChange={(e) => handleWeightChange(idx, parseFloat(e.target.value) || 0)}
@@ -165,6 +165,8 @@ function SviWeightsPage() {
                       step="0.05"
                       min="0"
                       max="1"
+                      className="font-mono tabular-nums"
+                      style={{ width: 62 }}
                       value={row.floor}
                       onChange={(e) => handleFloorChange(idx, parseFloat(e.target.value) || 0)}
                     />
@@ -178,7 +180,7 @@ function SviWeightsPage() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14 }}>
-        <div className={`weights-total ${isValid ? "ok" : "bad"}`}>
+        <div className={`weights-total font-mono tabular-nums ${isValid ? "ok" : "bad"}`}>
           Total Weight Sum: {total.toFixed(2)} {isValid ? "✓ (Valid 1.00)" : "⚠️ (Must equal 1.00)"}
         </div>
         {!isValid && (

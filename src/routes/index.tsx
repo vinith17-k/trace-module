@@ -10,8 +10,27 @@ function PublicHome() {
     <PublicLayout>
       <div className="pub-hero">
         <div>
-          <h1>Someone is ready to listen, right now.</h1>
-          <p>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              background: "rgba(196,106,72,0.1)",
+              border: "1px solid rgba(196,106,72,0.25)",
+              color: "var(--pub-terracotta)",
+              padding: "5px 12px",
+              borderRadius: 20,
+              fontSize: 12,
+              fontWeight: 700,
+              marginBottom: 16,
+            }}
+          >
+            <span>🇮🇳 National Helpline Against Atrocities (14566)</span>
+          </div>
+          <h1 className="font-display" style={{ letterSpacing: "-0.02em" }}>
+            Someone is ready to listen, right now.
+          </h1>
+          <p style={{ fontSize: 16.5, lineHeight: 1.6, color: "#3d4b45" }}>
             TRACE connects you to counselling, legal aid, and protection through NHAA (14566) — in
             your language, at your pace, and only with your consent.
           </p>
@@ -19,9 +38,16 @@ function PublicHome() {
             <Link
               to="/support"
               className="btn"
-              style={{ background: "var(--pub-terracotta)", color: "#fff" }}
+              style={{
+                background: "var(--pub-terracotta)",
+                color: "#fff",
+                boxShadow: "0 4px 14px rgba(196,106,72,0.35)",
+                padding: "12px 24px",
+                fontSize: 15,
+                fontWeight: 800,
+              }}
             >
-              Get support now
+              Get support now →
             </Link>
             <Link
               to="/about"
@@ -30,6 +56,8 @@ function PublicHome() {
                 background: "transparent",
                 border: "1.5px solid #cfc6b0",
                 color: "var(--pub-ink)",
+                padding: "12px 20px",
+                fontSize: 14.5,
               }}
             >
               How it works

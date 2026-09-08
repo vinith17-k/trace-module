@@ -183,30 +183,49 @@ function CaseQueuePage() {
                 }}
               >
                 <td>
-                  <b>{c.refId}</b>
-                  <div style={{ fontSize: 11, color: "var(--a-muted)" }}>Score: {c.score}/100</div>
+                  <b className="font-mono tabular-nums" style={{ letterSpacing: "0.03em" }}>
+                    {c.refId}
+                  </b>
+                  <div className="tabular-nums" style={{ fontSize: 11, color: "var(--a-muted)" }}>
+                    SVI: <b>{c.score}</b>/100
+                  </div>
                 </td>
                 <td>
                   <BadgeRisk level={c.risk} />
                 </td>
                 <td>
                   {c.status === "Resolved" ? (
-                    <span style={{ fontSize: 12, color: "var(--a-low)" }}>✓ Completed</span>
-                  ) : c.slaMinutesLeft <= 5 ? (
+                    <span className="badge-sla-routine" style={{ fontSize: 11.5, padding: "3px 8px", borderRadius: 6, fontWeight: 700 }}>
+                      ✓ Resolved
+                    </span>
+                  ) : c.slaMinutesLeft <= 10 ? (
                     <span
+                      className="badge-sla-critical"
                       style={{
                         fontSize: 11.5,
                         fontWeight: 800,
-                        color: "var(--a-critical)",
-                        background: "rgba(224,88,79,0.15)",
                         padding: "3px 8px",
                         borderRadius: 6,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
                       }}
                     >
-                      ⚠️ SLA: {c.slaMinutesLeft}m left
+                      ⚠️ {c.slaMinutesLeft}m left
                     </span>
                   ) : (
-                    <span style={{ fontSize: 12, color: "var(--a-muted)" }}>
+                    <span
+                      className="badge-sla-urgent tabular-nums"
+                      style={{
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        padding: "3px 8px",
+                        borderRadius: 6,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                      }}
+                    >
                       ⏱ {c.slaMinutesLeft}m left
                     </span>
                   )}

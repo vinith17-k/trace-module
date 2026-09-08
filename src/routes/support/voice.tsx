@@ -98,40 +98,98 @@ export function VoiceIntakePage() {
           <p className="v-lead">There's no rush. Say as much or as little as you'd like.</p>
 
           {recording ? (
-            <div className="voice-visual" id="voiceVisual">
-              <div className="pulse-ring">
-                <div className="wave">
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </div>
-              <p
+            <div className="voice-visual" id="voiceVisual" style={{ padding: "28px 20px" }}>
+              {/* Pulsing Concentric Radar Rings & Animated Waveform */}
+              <div
                 style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#3E5B41",
-                  margin: "0 0 4px",
-                  fontVariantNumeric: "tabular-nums",
+                  position: "relative",
+                  width: 120,
+                  height: 120,
+                  margin: "0 auto 16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {String(Math.floor(seconds / 60)).padStart(2, "0")}:
-                {String(seconds % 60).padStart(2, "0")}{" "}
-                <span style={{ fontSize: 12, color: "var(--v-muted)", fontWeight: 400 }}>
-                  / 02:00 max
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "50%",
+                    border: "2px solid rgba(125, 150, 118, 0.4)",
+                    animation: "pulse-radar 2.4s infinite ease-out",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 12,
+                    borderRadius: "50%",
+                    background: "rgba(195, 211, 190, 0.35)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div className="wave" style={{ gap: 5 }}>
+                    <span style={{ animation: "wave-bar 1.2s infinite ease-in-out", height: 18 }} />
+                    <span style={{ animation: "wave-bar 0.9s infinite ease-in-out 0.2s", height: 32 }} />
+                    <span style={{ animation: "wave-bar 1.4s infinite ease-in-out 0.4s", height: 44 }} />
+                    <span style={{ animation: "wave-bar 1.0s infinite ease-in-out 0.1s", height: 26 }} />
+                    <span style={{ animation: "wave-bar 1.3s infinite ease-in-out 0.3s", height: 16 }} />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, margin: "0 0 6px" }}>
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: "#c4593f",
+                    animation: "pulse-danger 1.5s infinite",
+                  }}
+                />
+                <span className="font-mono tabular-nums" style={{ fontSize: 18, fontWeight: 800, color: "#2d4431" }}>
+                  {String(Math.floor(seconds / 60)).padStart(2, "0")}:
+                  {String(seconds % 60).padStart(2, "0")}
                 </span>
+                <span style={{ fontSize: 12, color: "var(--v-muted)" }}>/ 02:00</span>
+              </div>
+
+              <p style={{ fontSize: 13, color: "var(--v-muted)", margin: "0 0 20px" }}>
+                Listening carefully in your preferred language…
               </p>
-              <p style={{ fontSize: 13, color: "var(--v-muted)", margin: "0 0 18px" }}>
-                Listening to audio signals…
-              </p>
-              <div className="voice-controls">
-                <button type="button" className="round-btn stop" onClick={stopRecording}>
-                  Stop recording
+
+              <div className="voice-controls" style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    background: "var(--v-emergency)",
+                    color: "#fff",
+                    padding: "9px 18px",
+                    fontSize: 13,
+                    boxShadow: "0 2px 10px rgba(189,72,44,0.25)",
+                  }}
+                  onClick={stopRecording}
+                >
+                  ⏹ Stop & Review
                 </button>
-                <button type="button" className="round-btn" onClick={restartRecording}>
-                  Start over
+                <button
+                  type="button"
+                  className="btn"
+                  style={{
+                    background: "transparent",
+                    border: "1.5px solid var(--v-border)",
+                    color: "var(--v-sys-text)",
+                    padding: "9px 16px",
+                    fontSize: 13,
+                  }}
+                  onClick={restartRecording}
+                >
+                  ↺ Restart
                 </button>
               </div>
             </div>

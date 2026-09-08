@@ -48,10 +48,13 @@ export function SviRing({ score, riskColor, riskCategory }: Props) {
     };
   }, [clamped, finalOffset, circ]);
 
+  const isCritical = (riskCategory?.toLowerCase() === "critical") || clamped >= 80;
+  const isHigh = (riskCategory?.toLowerCase() === "high") || (clamped >= 60 && clamped < 80);
+
   return (
-    <div className="svi-ring">
-      <svg width="110" height="110" aria-hidden="true">
-        <circle cx="55" cy="55" r={r} stroke="#323D4A" strokeWidth="10" fill="none" />
+    <div className={`svi-ring ${isCritical ? "risk-glow-critical" : isHigh ? "risk-glow-high" : ""}`} style={{ borderRadius: "50%" }}>
+      <svg width="120" height="120" viewBox="0 0 110 110" aria-hidden="true">
+        <circle cx="55" cy="55" r={r} stroke="var(--a-border)" strokeWidth="10" fill="none" opacity="0.6" />
         <circle
           cx="55"
           cy="55"
@@ -66,12 +69,13 @@ export function SviRing({ score, riskColor, riskCategory }: Props) {
             transform: "rotate(-90deg)",
             transformOrigin: "55px 55px",
             transition: "stroke-dashoffset 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            filter: isCritical ? "drop-shadow(0 0 6px rgba(235, 77, 66, 0.6))" : isHigh ? "drop-shadow(0 0 6px rgba(230, 157, 42, 0.5))" : undefined,
           }}
         />
       </svg>
-      <div className="svi-num">
-        <b>{displayScore}</b>
-        <span>/ 100</span>
+      <div className="svi-num tabular-nums font-mono">
+        <b style={{ fontSize: 24, letterSpacing: "-0.02em" }}>{displayScore}</b>
+        <span style={{ fontSize: 11, color: "var(--a-muted)" }}>/ 100</span>
       </div>
     </div>
   );

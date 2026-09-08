@@ -46,12 +46,31 @@ export function VictimLayout({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const [fontSizeScale, setFontSizeScale] = useState<"normal" | "large" | "xlarge">("normal");
+
   return (
-    <div className="victim" style={{ minHeight: "100vh", position: "relative" }}>
-      <div className="v-topbar" style={{ flexWrap: "wrap", gap: 12 }}>
+    <div
+      className={`victim v-stage-ambient ${fontSizeScale === "large" ? "text-lg-scale" : fontSizeScale === "xlarge" ? "text-xl-scale" : ""}`}
+      style={{
+        minHeight: "100vh",
+        position: "relative",
+        fontSize: fontSizeScale === "large" ? "1.125rem" : fontSizeScale === "xlarge" ? "1.25rem" : undefined,
+      }}
+    >
+      <div
+        className="v-topbar glass-header"
+        style={{
+          flexWrap: "wrap",
+          gap: 12,
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          borderBottom: "1px solid var(--v-border)",
+        }}
+      >
         {showLangBar ? (
-          <div className="v-lang">
-            {["English", "हिन्दी", "मराठी"].map((lang) => (
+          <div className="v-lang" style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            {["English", "हिन्दी", "मराठी", "తెలుగు", "தமிழ்"].map((lang) => (
               <button
                 key={lang}
                 type="button"
@@ -69,7 +88,70 @@ export function VictimLayout({
           </Link>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          {/* Accessible Font Size Zoom Controls */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              background: "rgba(0,0,0,0.04)",
+              borderRadius: 20,
+              padding: "2px 4px",
+              border: "1px solid var(--v-border)",
+            }}
+            title="Adjust text size for easier reading"
+            aria-label="Text Size Controls"
+          >
+            <button
+              type="button"
+              onClick={() => setFontSizeScale("normal")}
+              style={{
+                background: fontSizeScale === "normal" ? "#fff" : "transparent",
+                border: "none",
+                borderRadius: 14,
+                padding: "3px 8px",
+                fontSize: 11.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                color: "var(--v-sys-text)",
+              }}
+            >
+              A
+            </button>
+            <button
+              type="button"
+              onClick={() => setFontSizeScale("large")}
+              style={{
+                background: fontSizeScale === "large" ? "#fff" : "transparent",
+                border: "none",
+                borderRadius: 14,
+                padding: "3px 8px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                color: "var(--v-sys-text)",
+              }}
+            >
+              A+
+            </button>
+            <button
+              type="button"
+              onClick={() => setFontSizeScale("xlarge")}
+              style={{
+                background: fontSizeScale === "xlarge" ? "#fff" : "transparent",
+                border: "none",
+                borderRadius: 14,
+                padding: "3px 8px",
+                fontSize: 14.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                color: "var(--v-sys-text)",
+              }}
+            >
+              A++
+            </button>
+          </div>
+
           <Link to="/support/emergency" className="v-emergency-link">
             Emergency Help (14566)
           </Link>
@@ -78,7 +160,7 @@ export function VictimLayout({
             type="button"
             onClick={handleQuickExit}
             style={{
-              background: "#C4593F",
+              background: "var(--v-emergency)",
               color: "#fff",
               border: "none",
               borderRadius: 20,
@@ -89,7 +171,7 @@ export function VictimLayout({
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              boxShadow: "0 2px 8px rgba(196,89,63,0.3)",
+              boxShadow: "0 2px 8px rgba(189,72,44,0.3)",
             }}
             title="Press Esc or click to leave immediately and clear session"
             aria-keyshortcuts="Escape"
@@ -98,7 +180,7 @@ export function VictimLayout({
             <kbd
               style={{
                 fontSize: 10,
-                background: "rgba(0,0,0,0.2)",
+                background: "rgba(0,0,0,0.25)",
                 padding: "2px 5px",
                 borderRadius: 4,
               }}

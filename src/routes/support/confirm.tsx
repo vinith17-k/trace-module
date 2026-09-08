@@ -140,7 +140,8 @@ function PostIntakeConfirmationPage() {
                 Your Anonymous Reference ID
               </div>
               <div
-                style={{ fontSize: 18, fontWeight: 800, color: "#5A4E33", letterSpacing: ".04em" }}
+                className="font-mono tabular-nums"
+                style={{ fontSize: 20, fontWeight: 800, color: "#423722", letterSpacing: ".06em" }}
               >
                 {refId}
               </div>

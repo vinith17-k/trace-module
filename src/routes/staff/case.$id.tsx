@@ -7,6 +7,7 @@ import { SviRing } from "@/components/trace/SviRing";
 import { SignalBar } from "@/components/trace/SignalBar";
 import { ConfirmModal } from "@/components/trace/ConfirmModal";
 import { Toast } from "@/components/trace/Toast";
+import { SignalRadarMap } from "@/components/trace/SignalRadarMap";
 
 export const Route = createFileRoute("/staff/case/$id")({
   component: CaseDetailPage,
@@ -426,6 +427,21 @@ function CaseDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Live Geographical Signal Radar & Proximity Triage Map */}
+      <div
+        className="panel"
+        style={{
+          marginTop: 24,
+          padding: "24px 28px",
+          background: "#0a0e14",
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          borderRadius: 18,
+          boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
+        }}
+      >
+        <SignalRadarMap activeCaseId={caseId} isEmbedded />
       </div>
 
       {/* Mandatory Reason Dialog for Revealing Sensitive Transcript */}

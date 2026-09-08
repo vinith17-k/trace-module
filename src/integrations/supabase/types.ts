@@ -167,6 +167,53 @@ export type Database = {
           },
         ]
       }
+      offline_queue: {
+        Row: {
+          captured_at: string
+          created_at: string
+          gps_lat: number | null
+          gps_lng: number | null
+          id: string
+          interaction_id: string | null
+          payload: Json
+          synced: boolean
+          synced_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          gps_lat?: number | null
+          gps_lng?: number | null
+          id?: string
+          interaction_id?: string | null
+          payload?: Json
+          synced?: boolean
+          synced_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          gps_lat?: number | null
+          gps_lng?: number | null
+          id?: string
+          interaction_id?: string | null
+          payload?: Json
+          synced?: boolean
+          synced_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offline_queue_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "interactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recommendation_rules: {
         Row: {
           action_type: Database["public"]["Enums"]["action_type"]

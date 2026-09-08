@@ -195,6 +195,7 @@ export type Database = {
           payload: Json
           recommendation_id: string | null
           retry_count: number
+          sent_at: string | null
           status: string
           target: string | null
         }
@@ -207,6 +208,7 @@ export type Database = {
           payload?: Json
           recommendation_id?: string | null
           retry_count?: number
+          sent_at?: string | null
           status?: string
           target?: string | null
         }
@@ -219,6 +221,7 @@ export type Database = {
           payload?: Json
           recommendation_id?: string | null
           retry_count?: number
+          sent_at?: string | null
           status?: string
           target?: string | null
         }
@@ -465,6 +468,7 @@ export type Database = {
           id: string
           interaction_id: string
           language_code: string | null
+          model_version: string | null
           numeric_value: number | null
           signal_type: Database["public"]["Enums"]["signal_type"]
           value: Json
@@ -476,6 +480,7 @@ export type Database = {
           id?: string
           interaction_id: string
           language_code?: string | null
+          model_version?: string | null
           numeric_value?: number | null
           signal_type: Database["public"]["Enums"]["signal_type"]
           value?: Json
@@ -487,6 +492,7 @@ export type Database = {
           id?: string
           interaction_id?: string
           language_code?: string | null
+          model_version?: string | null
           numeric_value?: number | null
           signal_type?: Database["public"]["Enums"]["signal_type"]
           value?: Json
@@ -504,7 +510,7 @@ export type Database = {
       svi_assessments: {
         Row: {
           computed_at: string
-          config_version: number
+          config_version: string
           deleted_at: string | null
           id: string
           interaction_id: string
@@ -516,7 +522,7 @@ export type Database = {
         }
         Insert: {
           computed_at?: string
-          config_version?: number
+          config_version?: string
           deleted_at?: string | null
           id?: string
           interaction_id: string
@@ -528,7 +534,7 @@ export type Database = {
         }
         Update: {
           computed_at?: string
-          config_version?: number
+          config_version?: string
           deleted_at?: string | null
           id?: string
           interaction_id?: string

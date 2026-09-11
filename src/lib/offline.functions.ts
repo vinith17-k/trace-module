@@ -129,8 +129,14 @@ export const listOfflineSyncedRefs = createServerFn({ method: "GET" })
       .order("captured_at", { ascending: false })
       .limit(500);
 
+    interface OfflineCaseItem {
+      refId: string | undefined;
+      capturedAt: string;
+      syncedAt: string | null;
+    }
+
     const ids = (rows ?? []).map((r) => r.interaction_id).filter(Boolean) as string[];
-    if (ids.length === 0) return { offlineCases: [] as Array<Record<string, unknown>> };
+    if (ids.length === 0) return { offlineCases: [] as OfflineCaseItem[] };
 
     const { data: interactions } = await context.supabase
       .from("interactions")
@@ -139,13 +145,13 @@ export const listOfflineSyncedRefs = createServerFn({ method: "GET" })
 
     const refById = new Map((interactions ?? []).map((i) => [i.id, i.anonymized_ref_id]));
 
-    return {
-      offlineCases: (rows ?? [])
-        .filter((r) => r.interaction_id && refById.has(r.interaction_id))
-        .map((r) => ({
-          refId: refById.get(r.interaction_id as string),
-          capturedAt: r.captured_at,
-          syncedAt: r.synced_at,
-        })),
-    };
+    const offlineCases: OfflineCaseItem[] = (rows ?? [])
+      .filter((r) => r.interaction_id && refById.has(r.interaction_id))
+      .map((r) => ({
+        refId: refById.get(r.interaction_id as string),
+        capturedAt: r.captured_at,
+        syncedAt: r.synced_at,
+      }));
+
+    return { offlineCases };
   });
